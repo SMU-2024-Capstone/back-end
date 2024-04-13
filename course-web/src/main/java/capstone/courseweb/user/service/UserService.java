@@ -1,12 +1,11 @@
 package capstone.courseweb.user.service;
 
+import capstone.courseweb.user.domain.SignUpForm;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -26,17 +25,34 @@ import org.springframework.web.client.RestTemplate;
 
 public class UserService {
 
-    public String getUserInfo(String code) {
+    public SignUpForm getUserInfo(String code) throws JsonProcessingException{
 
         String accessToken = getAccessToken(code);
         log.info("access token: {}",accessToken);
 
-        return getKakaoUserInfo(accessToken);
+        String kakaoUserInfo = getKakaoUserInfo(accessToken);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode jsonNode = objectMapper.readTree(kakaoUserInfo);
+        //id, nickname 추출
+        String id = jsonNode.get("id").asText();
+        String nickname = jsonNode.get("properties").get("nickname").asText();
+        log.info("id: {}, nickname: {}", id, nickname);
+
+        //추출한 id, nickname과 provider로 signupform 생성
+        SignUpForm signUpForm = new SignUpForm();
+        signUpForm.setId(id);
+        signUpForm.setName(nickname);
+        signUpForm.setProvider("KAKAO");
+
+        //memberService.signUp(signUpForm); //db에 저장
+
+        return signUpForm;
     }
 
     // access token 발급
     public String getAccessToken(String code) {
-
+        log.info("getAccessToken");
         RestTemplate rt = new RestTemplate();
 
         // HTTP Header 생성
