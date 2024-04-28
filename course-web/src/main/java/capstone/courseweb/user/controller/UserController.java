@@ -4,6 +4,7 @@ import capstone.courseweb.jwt.JwtDto;
 import capstone.courseweb.jwt.JwtIssuer;
 import capstone.courseweb.user.domain.Member;
 import capstone.courseweb.user.domain.SignUpForm;
+import capstone.courseweb.user.service.MemberService;
 import capstone.courseweb.user.service.UserService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
@@ -23,11 +24,13 @@ public class UserController {
     UserService userService;
 
     private final JwtIssuer jwtIssuer;
+    private final MemberService memberService;
 
     @GetMapping("/user/callback/kakao")
     public ResponseEntity<JwtDto> kakaoLogin(@RequestParam("code") String code) throws JsonProcessingException {
         SignUpForm kakaoUserForm = userService.getUserInfo(code);
         log.info("Email: {}, ID: {}, Name: {}, Provider: {}", kakaoUserForm.getEmail(), kakaoUserForm.getId(), kakaoUserForm.getName(), kakaoUserForm.getProvider());
+        memberService.signUp(kakaoUserForm);
 
         //jwt token 생성 후 kakaoJwtToken에 저장
         JwtDto kakaoJwtToken = jwtIssuer.createToken(kakaoUserForm.getId(), kakaoUserForm.getName(), Member.MemberRole.USER.name());

@@ -1,5 +1,6 @@
 package capstone.courseweb.user.service;
 
+import capstone.courseweb.user.domain.Member;
 import capstone.courseweb.user.domain.SignUpForm;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -43,7 +44,7 @@ public class UserService {
         SignUpForm signUpForm = new SignUpForm();
         signUpForm.setId(id);
         signUpForm.setName(nickname);
-        signUpForm.setProvider("KAKAO");
+        signUpForm.setProvider(Member.MemberProvider.KAKAO);
 
         //memberService.signUp(signUpForm); //db에 저장
 

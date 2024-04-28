@@ -13,5 +13,5 @@ public class SignUpForm {
     private String email;
     private String Id;
     private String name;
-    private String provider;
+    private Member.MemberProvider provider;
 }
