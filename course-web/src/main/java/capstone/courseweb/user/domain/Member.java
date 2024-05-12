@@ -26,6 +26,7 @@ public class Member implements UserDetails {
     private String password; //UserDetails에 있어서 넣어야됨. 값은 null로 저장
 
     private String name;
+    private String nickname;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -95,4 +96,6 @@ public class Member implements UserDetails {
         NAVER,
         GOOGLE
     }
+
+    private String refresh_token;
 }

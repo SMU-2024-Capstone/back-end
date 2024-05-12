@@ -4,6 +4,7 @@ import capstone.courseweb.jwt.JwtDto;
 import capstone.courseweb.jwt.JwtIssuer;
 import capstone.courseweb.user.domain.Member;
 import capstone.courseweb.user.domain.SignUpForm;
+import capstone.courseweb.user.repository.MemberRepository;
 import capstone.courseweb.user.service.MemberService;
 import capstone.courseweb.user.service.UserService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -20,6 +21,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class UserController {
 
+    private SignUpForm kakaoUserForm;
+    private final MemberRepository memberRepository;
     @Autowired
     UserService userService;
 
@@ -27,15 +30,31 @@ public class UserController {
     private final MemberService memberService;
 
     @GetMapping("/user/callback/kakao")
-    public ResponseEntity<JwtDto> kakaoLogin(@RequestParam("code") String code) throws JsonProcessingException {
-        SignUpForm kakaoUserForm = userService.getUserInfo(code);
+    public ResponseEntity<String> kakaoLogin(@RequestParam("code") String code) throws JsonProcessingException {
+        kakaoUserForm = userService.getUserInfo(code);
         log.info("Email: {}, ID: {}, Name: {}, Provider: {}", kakaoUserForm.getEmail(), kakaoUserForm.getId(), kakaoUserForm.getName(), kakaoUserForm.getProvider());
-        memberService.signUp(kakaoUserForm);
 
-        //jwt token 생성 후 kakaoJwtToken에 저장
-        JwtDto kakaoJwtToken = jwtIssuer.createToken(kakaoUserForm.getId(), kakaoUserForm.getName(), Member.MemberRole.USER.name());
-        log.info("access token: {}, refresh token: {}", kakaoJwtToken.getAccessToken(), kakaoJwtToken.getRefreshToken());
-        return ResponseEntity.ok(kakaoJwtToken);
+        if (memberRepository.existsById(kakaoUserForm.getId())) { //db에 회원정보 있을 때
+            return ResponseEntity.ok("로그인");
+        }
+        else { //db에 회원정보 없을 때
+            return ResponseEntity.ok("회원가입. 닉네임 설정으로 이동");
+        }
+    }
+
+    /**닉네임 중복 추가**/
+    @GetMapping("/user/nickname")
+    public ResponseEntity<?> nicknameCheck(@RequestParam("nickname") String nickname) {
+        if (memberRepository.existsByNickname(nickname)) {
+            return ResponseEntity.ok("닉네임 중복");
+        } else { //닉네임 중복 아닐 때
+            kakaoUserForm.setNickname(nickname);
+            JwtDto kakaoJwtToken = jwtIssuer.createToken(kakaoUserForm.getId(), kakaoUserForm.getName(), Member.MemberRole.GUEST.name());
+            kakaoUserForm.setRefresh_token(kakaoJwtToken.getRefreshToken());
+            memberService.signUp(kakaoUserForm);
+            log.info("access token: {}, refresh token: {}", kakaoJwtToken.getAccessToken(), kakaoJwtToken.getRefreshToken());
+            return ResponseEntity.ok(kakaoJwtToken);
+        }
     }
 
 }
