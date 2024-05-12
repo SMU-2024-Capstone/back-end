@@ -37,3 +37,7 @@ out/
 .vscode/
 
 *.yml
+
+# Ignore application.yml and application-oauth.yml
+/application.yml
+/application-oauth.yml

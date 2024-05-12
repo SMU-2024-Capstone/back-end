@@ -13,5 +13,7 @@ public class SignUpForm {
     private String email;
     private String Id;
     private String name;
+    private String nickname;
     private Member.MemberProvider provider;
+    private String refresh_token;
 }
