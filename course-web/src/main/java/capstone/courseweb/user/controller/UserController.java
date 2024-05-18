@@ -12,9 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -43,18 +41,30 @@ public class UserController {
     }
 
     /**닉네임 중복 추가**/
-    @GetMapping("/user/nickname")
-    public ResponseEntity<?> nicknameCheck(@RequestParam("nickname") String nickname) {
+    @PostMapping("/user/nickname")
+    public ResponseEntity<?> nicknameCheck(@RequestBody NicknameRequest nicknameRequest) {
+        String nickname = nicknameRequest.getNickname();
+        log.info("닉네임: " + nickname);
         if (memberRepository.existsByNickname(nickname)) {
+            log.info("닉네임 중복");
             return ResponseEntity.ok("닉네임 중복");
         } else { //닉네임 중복 아닐 때
             kakaoUserForm.setNickname(nickname);
             JwtDto kakaoJwtToken = jwtIssuer.createToken(kakaoUserForm.getId(), kakaoUserForm.getName(), Member.MemberRole.GUEST.name());
             kakaoUserForm.setRefresh_token(kakaoJwtToken.getRefreshToken());
             memberService.signUp(kakaoUserForm);
+            log.info("닉네임 저장");
             log.info("access token: {}, refresh token: {}", kakaoJwtToken.getAccessToken(), kakaoJwtToken.getRefreshToken());
             return ResponseEntity.ok(kakaoJwtToken);
         }
     }
 
+}
+
+class NicknameRequest {
+    private String nickname;
+
+    public String getNickname() {
+        return nickname;
+    }
 }

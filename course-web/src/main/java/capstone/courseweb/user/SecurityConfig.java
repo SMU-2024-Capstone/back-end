@@ -25,6 +25,7 @@ private final JwtFilter jwtFilter;
         return http
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/user/callback/kakao").permitAll()
+                        .requestMatchers("/user/nickname").permitAll()
                         .requestMatchers("/h2-console/**").permitAll()  // H2-Console 허용 (중복 허용)
                         .anyRequest().authenticated()
                 )
