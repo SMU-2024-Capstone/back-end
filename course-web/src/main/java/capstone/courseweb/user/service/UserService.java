@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -25,6 +26,9 @@ import org.springframework.web.client.RestTemplate;
 @RequiredArgsConstructor
 
 public class UserService {
+
+    @Value("${kakao.api-key}")
+    private String CLIENT_ID;
 
     public SignUpForm getUserInfo(String code) throws JsonProcessingException{
 
@@ -53,6 +57,7 @@ public class UserService {
 
     // access token 발급
     public String getAccessToken(String code) {
+
         log.info("getAccessToken");
         RestTemplate rt = new RestTemplate();
 
@@ -63,7 +68,7 @@ public class UserService {
         // HTTP Body 생성
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("grant_type", "authorization_code");
-        params.add("client_id", "9d8918ecc1284404c0cfcc0d03046079");
+        params.add("client_id", CLIENT_ID);
         params.add("redirect_uri", "http://localhost:5173/login/oauth2/code/kakao");
         params.add("code", code);
 
