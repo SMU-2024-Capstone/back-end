@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -22,25 +23,43 @@ public class RandomRestController {
     private PlaceDto pickedPlace;
     private final SearchByKeywordService searchByKeywordService;
 
+
     @GetMapping("/search/category")
-    public String search(
+    public ResponseEntity<List<PlaceDto>> search(
             @RequestParam String region,
-            @RequestParam List<String> categories) {
+            @RequestParam List<String> categories) throws JsonProcessingException {
 
         log.info("Region: " + region);
         log.info("Categories: " + categories);
 
         searchForm = new SearchForm(region, categories.toArray(new String[0]));
+        placeDtos = new ArrayList<>();
 
         log.info(searchForm.getLocal());
         for (String category : searchForm.getCategories()) {
             log.info("Category: " + category);
         }
 
-        return "검색 요청 처리";
-    }
-    
+        for (int i = 0; i < searchForm.getCategories().length; i++) {
+            if(i == 0) {
+                placeDtos.add(searchByKeywordService.random(
+                        searchByKeywordService.getPlaceByKeyword(region + searchForm.getCategories()[i],
+                                null, null, true)));
+            }
+            else {
+                placeDtos.add(searchByKeywordService.random(
+                        searchByKeywordService.getPlaceByKeyword(searchForm.getCategories()[i],
+                                placeDtos.get(i-1).getX(), placeDtos.get(i-1).getY(), false)));
 
+            }
+        }
+
+        return ResponseEntity.ok(placeDtos);
+
+    }
+
+
+    /*
     @GetMapping("/keyword/{query}")
     public ResponseEntity<PlaceDto> random(@PathVariable String query) throws JsonProcessingException {
         log.info("호출됨");
@@ -49,6 +68,8 @@ public class RandomRestController {
         log.info(placeDtos.toString());
         return ResponseEntity.ok(pickedPlace);
     }
+
+     */
 
 
 }
