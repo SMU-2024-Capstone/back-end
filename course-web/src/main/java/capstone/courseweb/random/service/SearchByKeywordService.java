@@ -28,9 +28,7 @@ import java.util.Random;
 public class SearchByKeywordService {
     @Value("${kakao.api-key}")
     private String CLIENT_ID;
-
-    private final String uri = "https://dapi.kakao.com/v2/local/search/keyword";
-
+    private final String KAKAO_API_URL = "https://dapi.kakao.com/v2/local/search/keyword";
     private HttpEntity<String> httpEntity;
 
     @PostConstruct
@@ -42,11 +40,11 @@ public class SearchByKeywordService {
     }
 
 
-    public List<PlaceDto> getPlaceByKeyword(String query, String x, String y, boolean isFirst) throws JsonProcessingException {
+    public List<PlaceDto> searchPlacesByKeyword(String query, String x, String y, boolean isFirst) throws JsonProcessingException {
         URI tmp;
         if(isFirst) {
             tmp =
-                    UriComponentsBuilder.fromHttpUrl(uri)
+                    UriComponentsBuilder.fromHttpUrl(KAKAO_API_URL)
                             .queryParam("query", query)
                             .encode(StandardCharsets.UTF_8)
                             .build().toUri();
@@ -54,7 +52,7 @@ public class SearchByKeywordService {
         else {
             tmp =
 
-                    UriComponentsBuilder.fromHttpUrl(uri)
+                    UriComponentsBuilder.fromHttpUrl(KAKAO_API_URL)
                             .queryParam("query", query)
                             .queryParam("x", x)
                             .queryParam("y", y)
@@ -85,13 +83,9 @@ public class SearchByKeywordService {
         return searchList;
     }
 
-    public PlaceDto random(List<PlaceDto> placeDtos) throws JsonProcessingException {
+    public PlaceDto getRandomPlace(List<PlaceDto> places) throws JsonProcessingException {
         Random random = new Random();
-        random.setSeed(System.currentTimeMillis());
-
-        int r = random.nextInt(placeDtos.size());
-
-        return placeDtos.get(r);
+        return places.get(random.nextInt(places.size()));
     }
 
 }
