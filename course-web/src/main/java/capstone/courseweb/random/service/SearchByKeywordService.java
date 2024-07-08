@@ -20,6 +20,7 @@ import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 @Service
 @Transactional
@@ -40,11 +41,27 @@ public class SearchByKeywordService {
         httpEntity = new HttpEntity<>(headers);
     }
 
-    public List<PlaceDto> getPlaceByKeyword(String query) throws JsonProcessingException {
-        URI tmp = UriComponentsBuilder.fromHttpUrl(uri)
-                .queryParam("query", query)
-                .encode(StandardCharsets.UTF_8)
-                .build().toUri();
+
+    public List<PlaceDto> getPlaceByKeyword(String query, String x, String y, boolean isFirst) throws JsonProcessingException {
+        URI tmp;
+        if(isFirst) {
+            tmp =
+                    UriComponentsBuilder.fromHttpUrl(uri)
+                            .queryParam("query", query)
+                            .encode(StandardCharsets.UTF_8)
+                            .build().toUri();
+        }
+        else {
+            tmp =
+
+                    UriComponentsBuilder.fromHttpUrl(uri)
+                            .queryParam("query", query)
+                            .queryParam("x", x)
+                            .queryParam("y", y)
+                            .queryParam("15000")
+                            .encode(StandardCharsets.UTF_8)
+                            .build().toUri();
+        }
 
         Assert.notNull(query, "query");
         ResponseEntity<String> response = new RestTemplate().exchange(tmp, HttpMethod.GET, httpEntity, String.class);
@@ -66,6 +83,15 @@ public class SearchByKeywordService {
                             .build());
         }
         return searchList;
+    }
+
+    public PlaceDto random(List<PlaceDto> placeDtos) throws JsonProcessingException {
+        Random random = new Random();
+        random.setSeed(System.currentTimeMillis());
+
+        int r = random.nextInt(placeDtos.size());
+
+        return placeDtos.get(r);
     }
 
 }
