@@ -20,6 +20,7 @@ import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 @Service
 @Transactional
@@ -66,6 +67,15 @@ public class SearchByKeywordService {
                             .build());
         }
         return searchList;
+    }
+
+    public PlaceDto random(List<PlaceDto> placeDtos) throws JsonProcessingException {
+        Random random = new Random();
+        random.setSeed(System.currentTimeMillis());
+
+        int r = random.nextInt(placeDtos.size());
+
+        return placeDtos.get(r);
     }
 
 }

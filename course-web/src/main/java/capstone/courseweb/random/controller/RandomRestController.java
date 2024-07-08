@@ -17,15 +17,17 @@ import java.util.List;
 public class RandomRestController {
 
     private List<PlaceDto> placeDtos;
+    private PlaceDto pickedPlace;
     private final SearchByKeywordService searchByKeywordService;
 
 
     @GetMapping("/keyword/{query}")
-    public ResponseEntity<List<PlaceDto>> random(@PathVariable String query) throws JsonProcessingException {
+    public ResponseEntity<PlaceDto> random(@PathVariable String query) throws JsonProcessingException {
         log.info("호출됨");
         placeDtos = searchByKeywordService.getPlaceByKeyword(query);
+        pickedPlace = searchByKeywordService.random(placeDtos);
         log.info(placeDtos.toString());
-        return ResponseEntity.ok(searchByKeywordService.getPlaceByKeyword(query));
+        return ResponseEntity.ok(pickedPlace);
     }
 
 }
