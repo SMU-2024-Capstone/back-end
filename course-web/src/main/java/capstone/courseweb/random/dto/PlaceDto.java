@@ -1,5 +1,14 @@
 package capstone.courseweb.random.dto;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+@Getter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class PlaceDto {
     private String placeName;   // place_name
     private String addressName; // address_name
@@ -7,7 +16,6 @@ public class PlaceDto {
     private String y;   // y
     private String placeURL;    // place_url
     private String categoryName;    // category_name
-
 }
 
 /*
