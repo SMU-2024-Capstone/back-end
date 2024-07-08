@@ -15,6 +15,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SearchByKeywordController {
 
+    /*
     private SearchForm searchForm;
 
 
@@ -35,4 +36,6 @@ public class SearchByKeywordController {
 
         return "검색 요청 처리";
     }
+
+     */
 }

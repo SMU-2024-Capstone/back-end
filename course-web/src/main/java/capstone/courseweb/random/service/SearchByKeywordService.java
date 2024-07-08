@@ -41,11 +41,27 @@ public class SearchByKeywordService {
         httpEntity = new HttpEntity<>(headers);
     }
 
-    public List<PlaceDto> getPlaceByKeyword(String query) throws JsonProcessingException {
-        URI tmp = UriComponentsBuilder.fromHttpUrl(uri)
-                .queryParam("query", query)
-                .encode(StandardCharsets.UTF_8)
-                .build().toUri();
+
+    public List<PlaceDto> getPlaceByKeyword(String query, String x, String y, boolean isFirst) throws JsonProcessingException {
+        URI tmp;
+        if(isFirst) {
+            tmp =
+                    UriComponentsBuilder.fromHttpUrl(uri)
+                            .queryParam("query", query)
+                            .encode(StandardCharsets.UTF_8)
+                            .build().toUri();
+        }
+        else {
+            tmp =
+
+                    UriComponentsBuilder.fromHttpUrl(uri)
+                            .queryParam("query", query)
+                            .queryParam("x", x)
+                            .queryParam("y", y)
+                            .queryParam("15000")
+                            .encode(StandardCharsets.UTF_8)
+                            .build().toUri();
+        }
 
         Assert.notNull(query, "query");
         ResponseEntity<String> response = new RestTemplate().exchange(tmp, HttpMethod.GET, httpEntity, String.class);
