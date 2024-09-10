@@ -1,7 +1,7 @@
 package capstone.courseweb.user;
 
 
-import capstone.courseweb.jwt.JwtFilter;
+import capstone.courseweb.jwt.filter.JwtFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,6 +28,8 @@ private final JwtFilter jwtFilter;
                         .requestMatchers("/keyword/**").permitAll()
                         .requestMatchers("/user/nickname").permitAll()
                         .requestMatchers("/search/category").permitAll()
+                        .requestMatchers("/test-result").permitAll()
+                        .requestMatchers("/refresh-token").permitAll()
                         .requestMatchers("/h2-console/**").permitAll()  // H2-Console 허용 (중복 허용)
                         .anyRequest().authenticated()
                 )

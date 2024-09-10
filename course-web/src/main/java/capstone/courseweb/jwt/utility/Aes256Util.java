@@ -1,4 +1,4 @@
-package capstone.courseweb.jwt;
+package capstone.courseweb.jwt.utility;
 
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Value;

@@ -29,6 +29,7 @@ public class SearchByKeywordService {
     @Value("${kakao.api-key}")
     private String CLIENT_ID;
     private final String KAKAO_API_URL = "https://dapi.kakao.com/v2/local/search/keyword";
+    //private static final String RADIUS = "15000";
     private HttpEntity<String> httpEntity;
 
     @PostConstruct
@@ -56,7 +57,8 @@ public class SearchByKeywordService {
                             .queryParam("query", query)
                             .queryParam("x", x)
                             .queryParam("y", y)
-                            .queryParam("15000")
+                            .queryParam("3000")
+                            //.queryParam("radius","3000")
                             .encode(StandardCharsets.UTF_8)
                             .build().toUri();
         }
@@ -65,6 +67,7 @@ public class SearchByKeywordService {
         ResponseEntity<String> response = new RestTemplate().exchange(tmp, HttpMethod.GET, httpEntity, String.class);
 
         JSONObject jsonObject = new JSONObject(response.getBody().toString());
+        System.out.println("카카오맵 api documents" + response);
         JSONArray jsonArray = jsonObject.getJSONArray("documents");
 
         List<PlaceDto> searchList = new ArrayList<>();
@@ -78,8 +81,11 @@ public class SearchByKeywordService {
                             .y(documentObj.getString("y"))
                             .placeURL(documentObj.getString("place_url"))
                             .categoryName(documentObj.getString("category_name"))
+                            .distance(documentObj.getString("distance"))
                             .build());
         }
+
+        System.out.println("장소 사이 거리: " + searchList.get(0).getDistance());
         return searchList;
     }
 
