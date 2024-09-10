@@ -1,5 +1,7 @@
-package capstone.courseweb.jwt;
+package capstone.courseweb.jwt.config;
 
+import capstone.courseweb.jwt.JwtDto;
+import capstone.courseweb.jwt.utility.JwtIssuer;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -33,11 +35,11 @@ public class JwtAuthProvider { //토큰 인증 처리
             return false;
         }
 
-        String role = claims.get("role", String.class);
+        /*String role = claims.get("role", String.class);
         if (role == null || !role.equals("admin")) {
             // 사용자가 관리자가 아님
             return false;
-        }
+        }*/
 
 
         /*if (!jwtIssuer.verifySignature(token)) {
@@ -49,7 +51,7 @@ public class JwtAuthProvider { //토큰 인증 처리
         return true;
     }
 
-    public boolean validateToken(JwtDto jwtDto) {//재발급
+    public boolean validateToken(JwtDto jwtDto) {
         if (!StringUtils.hasText(jwtDto.getAccessToken())
                 || !StringUtils.hasText(jwtDto.getRefreshToken())) {
             return false;
@@ -64,7 +66,7 @@ public class JwtAuthProvider { //토큰 인증 처리
 
     public Authentication getAuthentication(String token) {
         Claims claims = jwtIssuer.getClaims(token);
-        String id = jwtIssuer.getSubject(claims);
+        String id = jwtIssuer.getSubject(claims); //userid
         UserDetails userDetails = userDetailsService.loadUserByUsername(id);
 
         return new UsernamePasswordAuthenticationToken(userDetails, null,

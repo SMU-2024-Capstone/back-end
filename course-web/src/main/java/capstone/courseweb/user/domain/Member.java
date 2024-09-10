@@ -12,13 +12,15 @@ import java.util.Collection;
 import java.util.Collections;
 
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @Entity
 public class Member implements UserDetails {
     @Id
-    @Column(nullable = false, unique = true)//@GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(nullable = false, unique = true)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private String Id; //소셜id
 
     private String email;
@@ -28,18 +30,18 @@ public class Member implements UserDetails {
     private String name;
     private String nickname;
 
-    @Enumerated(EnumType.STRING)
+    /*@Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private MemberRole memberRole;
+    private MemberRole memberRole;*/
 
-    @Enumerated(EnumType.STRING)
+    /*@Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private MemberProvider provider;
+    private MemberProvider provider;*/
 
     @Override
     @JsonIgnore
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.singleton(new SimpleGrantedAuthority(this.memberRole.getAuthority()));
+        return Collections.singleton(new SimpleGrantedAuthority(this.nickname));
     }
 
     @Override
@@ -51,7 +53,7 @@ public class Member implements UserDetails {
     @Override
     @JsonIgnore
     public String getUsername() {
-        return email;
+        return nickname;
     }
 
 
@@ -79,7 +81,7 @@ public class Member implements UserDetails {
         return true;
     }
 
-    @Getter
+    /*@Getter
     @RequiredArgsConstructor
     public enum MemberRole {
         GUEST,
@@ -88,14 +90,16 @@ public class Member implements UserDetails {
         public String getAuthority() {
             return PREFIX + this.name();
         }
-    }
+    }*/
 
-    public enum  MemberProvider {
+    /*public enum  MemberProvider {
         LOCAL,
         KAKAO,
         NAVER,
         GOOGLE
-    }
+    }*/
 
     private String refresh_token;
+
+    private String user_vector;
 }

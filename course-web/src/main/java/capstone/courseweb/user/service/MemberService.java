@@ -33,8 +33,8 @@ public class MemberService implements UserDetailsService {
                 .email(form.getEmail())
                 .Id(form.getId())//passwordEncoder.encode(form.getId())
                 .name(form.getName())
-                .memberRole(Member.MemberRole.USER)
-                .provider(Member.MemberProvider.LOCAL)
+                //.provider(Member.MemberProvider.LOCAL)
+                .refresh_token(form.getRefresh_token())
                 .build());
     }
 
@@ -42,4 +42,6 @@ public class MemberService implements UserDetailsService {
         return memberRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("일치하는 정보가 없습니다."));
     }
+
+
 }

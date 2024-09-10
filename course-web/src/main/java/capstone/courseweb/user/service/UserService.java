@@ -2,6 +2,7 @@ package capstone.courseweb.user.service;
 
 import capstone.courseweb.user.domain.Member;
 import capstone.courseweb.user.domain.SignUpForm;
+import capstone.courseweb.user.repository.MemberRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -12,6 +13,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -48,7 +50,7 @@ public class UserService {
         SignUpForm signUpForm = new SignUpForm();
         signUpForm.setId(id);
         signUpForm.setName(nickname);
-        signUpForm.setProvider(Member.MemberProvider.KAKAO);
+        //signUpForm.setProvider(Member.MemberProvider.KAKAO);
 
         //memberService.signUp(signUpForm); //db에 저장
 

@@ -1,8 +1,7 @@
 package capstone.courseweb.user.controller;
 
 import capstone.courseweb.jwt.JwtDto;
-import capstone.courseweb.jwt.JwtIssuer;
-import capstone.courseweb.user.domain.Member;
+import capstone.courseweb.jwt.utility.JwtIssuer;
 import capstone.courseweb.user.domain.SignUpForm;
 import capstone.courseweb.user.repository.MemberRepository;
 import capstone.courseweb.user.service.MemberService;
@@ -30,7 +29,7 @@ public class UserController {
     @GetMapping("/user/callback/kakao")
     public ResponseEntity<String> kakaoLogin(@RequestParam("code") String code) throws JsonProcessingException {
         kakaoUserForm = userService.getUserInfo(code);
-        log.info("Email: {}, ID: {}, Name: {}, Provider: {}", kakaoUserForm.getEmail(), kakaoUserForm.getId(), kakaoUserForm.getName(), kakaoUserForm.getProvider());
+        log.info("Email: {}, ID: {}, Name: {}, Provider: {}", kakaoUserForm.getEmail(), kakaoUserForm.getId(), kakaoUserForm.getName()); //, kakaoUserForm.getProvider()
 
         if (memberRepository.existsById(kakaoUserForm.getId())) { //db에 회원정보 있을 때
             return ResponseEntity.ok("로그인");
@@ -42,7 +41,7 @@ public class UserController {
 
     /**닉네임 중복 추가**/
     @PostMapping("/user/nickname")
-    public ResponseEntity<?> nicknameCheck(@RequestBody NicknameRequest nicknameRequest) {
+    public ResponseEntity<?> nicknameCheck(@RequestBody NicknameController nicknameRequest) {
         String nickname = nicknameRequest.getNickname();
         log.info("닉네임: " + nickname);
         if (memberRepository.existsByNickname(nickname)) {
@@ -50,7 +49,8 @@ public class UserController {
             return ResponseEntity.ok("닉네임 중복");
         } else { //닉네임 중복 아닐 때
             kakaoUserForm.setNickname(nickname);
-            JwtDto kakaoJwtToken = jwtIssuer.createToken(kakaoUserForm.getId(), kakaoUserForm.getName(), Member.MemberRole.GUEST.name());
+            //카카오 아이디, 카카오 닉네임, 이길로 닉네임으로 jwt 토큰 생성
+            JwtDto kakaoJwtToken = jwtIssuer.createToken(kakaoUserForm.getId(), kakaoUserForm.getName(), kakaoUserForm.getNickname());
             kakaoUserForm.setRefresh_token(kakaoJwtToken.getRefreshToken());
             memberService.signUp(kakaoUserForm);
             log.info("닉네임 저장");
@@ -59,12 +59,4 @@ public class UserController {
         }
     }
 
-}
-
-class NicknameRequest {
-    private String nickname;
-
-    public String getNickname() {
-        return nickname;
-    }
 }

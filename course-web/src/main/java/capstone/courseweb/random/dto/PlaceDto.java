@@ -16,6 +16,7 @@ public class PlaceDto {
     private String y;   // y
     private String placeURL;    // place_url
     private String categoryName;    // category_name
+    private String distance; //장소 사이의 거리
 }
 
 /*

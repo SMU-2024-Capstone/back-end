@@ -1,6 +1,7 @@
-package capstone.courseweb.jwt;
+package capstone.courseweb.jwt.filter;
 
 
+import capstone.courseweb.jwt.config.JwtAuthProvider;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

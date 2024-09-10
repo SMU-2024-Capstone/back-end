@@ -1,5 +1,6 @@
-package capstone.courseweb.jwt;
+package capstone.courseweb.jwt.utility;
 
+import capstone.courseweb.jwt.JwtDto;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -37,12 +38,13 @@ public class JwtIssuer {
         SECRET_KEY = Base64.getEncoder().encodeToString(SECRET_KEY.getBytes());
     }
 
-    public JwtDto createToken(String userId, String userName, String role) { //id, name, role로 토큰 생성
+    public JwtDto createToken(String userId, String userName, String nickname) { //id, name, role로 토큰 생성
         String encryptedId = aes256Util.encrypt(userId);
         Claims claims = Jwts.claims().setSubject(encryptedId); //claim: jwt에 포함될 정보
-        //claims.put("id", userId);
+        claims.put("id", userId);
         claims.put("name", userName);
-        claims.put(KEY_ROLES, role);
+        claims.put("nickname", nickname);
+        //claims.put(KEY_ROLES, role);
 
         Date now = new Date();
 
@@ -53,7 +55,6 @@ public class JwtIssuer {
                 .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
                 .compact();
 
-        claims.setSubject(encryptedId);
 
         String refreshToken = Jwts.builder()
                 .setClaims(claims)
@@ -78,7 +79,13 @@ public class JwtIssuer {
     public Claims getClaims(String token) {
         Claims claims;
         try {
-            claims = Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token).getBody();
+            claims = Jwts.parser()
+                    .setSigningKey(SECRET_KEY)
+                    //.build
+                    .parseClaimsJws(token).getBody();
+
+            log.info("claim 복호화 확인", claims.get("id", String.class));
+
         }catch (ExpiredJwtException e) {
             claims = e.getClaims();
         }catch (Exception e) {

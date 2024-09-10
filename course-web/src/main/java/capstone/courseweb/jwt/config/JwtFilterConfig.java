@@ -1,5 +1,6 @@
-package capstone.courseweb.jwt;
+package capstone.courseweb.jwt.config;
 
+import capstone.courseweb.jwt.filter.JwtFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
