@@ -37,14 +37,17 @@ public class PlaceSearchController {
     private final JwtIssuer jwtIssuer;
     private final MemberRepository memberRepository;
 
+
     @PostMapping("/search/category")
     public ResponseEntity<Map<String, Object>> searchPlaces(
             @RequestBody SelectedCategory selectedCategory
             ) throws JsonProcessingException { //, @RequestHeader("Authorization")String token
         System.out.println("search/category 진입 성공");
 
+        /*
         // JWT 토큰 검증
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
         if (authentication == null || !authentication.isAuthenticated()) {
             Map<String, Object> errorResponse = new HashMap<>();
             errorResponse.put("error", "Invalid JWT token");
@@ -56,11 +59,14 @@ public class PlaceSearchController {
         System.out.println("JWT 토큰 검증 받은 사용자 nickname: " + nickname);
 
         Optional<Member> memberOpt = memberRepository.findByNickname(nickname);
+
         if (memberOpt.isEmpty()) {
             Map<String, Object> errorResponse = new HashMap<>();
             errorResponse.put("error", "User not found");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
         }
+
+         */
 
 
         //jwt 토큰 검증
@@ -75,6 +81,7 @@ public class PlaceSearchController {
         /*Claims claims = jwtIssuer.getClaims(token);
         String id = claims.get("id", String.class);
         Optional<Member> memberOpt = memberRepository.findById(id);*/
+
 
 
 
@@ -112,25 +119,24 @@ public class PlaceSearchController {
             log.info("Category: " + category);
         }
 
+
+        // 결과로 반환할 데이터 구조 생성
+        Map<String, Object> response = new HashMap<>();
+
+
         for (int i = 0; i < searchForm.getCategories().length; i++) {
             String query = (i == 0) ? selectedCategory.getRegion() + ' ' +  searchForm.getCategories()[i] : searchForm.getCategories()[i];
             String x = (i == 0) ? null : placeList.get(i-1).getX();
             String y = (i == 0) ? null : placeList.get(i-1).getY();
             boolean isFirst = (i == 0);
+            Optional<PlaceDto> op = searchService.searchPlacesByKeyword(query, x, y, isFirst);
+            op.ifPresent(placeList::add);
+            if(op.isEmpty()){
+                response.put("info", 0);
+                return ResponseEntity.ok(response);
+            }
 
-            placeList.add(searchService.getRandomPlace(
-                    searchService.searchPlacesByKeyword(query, x, y, isFirst)));
         }
-
-        log.info("카카오맵까진 ok");
-        log.info(placeList.get(0).getPlaceName());
-        log.info(placeList.get(0).getY());
-        log.info(placeList.get(1).getPlaceName());
-        log.info(placeList.get(1).getY());
-        log.info(placeList.get(2).getPlaceName());
-        log.info(placeList.get(2).getY());
-
-
 
         List<RouteDto> routes = routeService.findRoutesBetweenPlaces(placeList);
 
@@ -155,8 +161,7 @@ public class PlaceSearchController {
 
         System.out.println("placeInfo" + placeInfo);
 
-        // 결과로 반환할 데이터 구조 생성
-        Map<String, Object> response = new HashMap<>();
+
         response.put("route", routes);
         response.put("info", placeInfo);
 
