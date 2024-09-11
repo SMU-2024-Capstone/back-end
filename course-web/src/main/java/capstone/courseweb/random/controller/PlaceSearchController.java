@@ -4,7 +4,6 @@ import capstone.courseweb.ai.PreferenceService;
 import capstone.courseweb.jwt.config.JwtAuthProvider;
 import capstone.courseweb.jwt.utility.JwtIssuer;
 import capstone.courseweb.random.domain.SearchForm;
-import capstone.courseweb.random.domain.SelectedCategory;
 import capstone.courseweb.random.dto.PlaceDto;
 import capstone.courseweb.random.dto.RouteDto;
 import capstone.courseweb.random.service.RouteService;
@@ -37,10 +36,10 @@ public class PlaceSearchController {
     private final JwtIssuer jwtIssuer;
     private final MemberRepository memberRepository;
 
-    @PostMapping("/search/category")
+    @GetMapping("/search/category")
     public ResponseEntity<Map<String, Object>> searchPlaces(
-            @RequestBody SelectedCategory selectedCategory
-            ) throws JsonProcessingException { //, @RequestHeader("Authorization")String token
+            @RequestParam String region,
+            @RequestParam List<String> categories) throws JsonProcessingException { //, @RequestHeader("Authorization")String token
 
 
         // JWT 토큰 검증
@@ -78,33 +77,10 @@ public class PlaceSearchController {
 
 
 
-        log.info("Region: " + selectedCategory.getRegion());
-        log.info("Categories: " + selectedCategory.getCategories());
+        log.info("Region: " + region);
+        log.info("Categories: " + categories);
 
-        /*
-        String[][] categoriesArray = new String[categories.size()][];
-        for (int i = 0; i<categoriesArray.length; i++) {
-            categoriesArray[i] = categories.get(i).toArray(new String[0]);
-        }
-
-         */
-
-        /*
-                Random random = new Random();
-        return places.get(random.nextInt(places.size()));
-         */
-        String[] categoriesFinal = new String[selectedCategory.getCategories().size()];
-
-        for (int i = 0; i<selectedCategory.getCategories().size(); i++) {
-            Random random = new Random();
-            // random.nextInt(categories.get(i).size())
-            categoriesFinal[i] = selectedCategory.getCategories().get(i).get(random.nextInt(selectedCategory.getCategories().get(i).size()));
-        }
-
-
-
-
-        SearchForm searchForm = new SearchForm(selectedCategory.getRegion(), categoriesFinal);
+        SearchForm searchForm = new SearchForm(region, categories.toArray(new String[0]));
         List<PlaceDto> placeList = new ArrayList<>();
 
         log.info(searchForm.getLocal());
@@ -113,7 +89,7 @@ public class PlaceSearchController {
         }
 
         for (int i = 0; i < searchForm.getCategories().length; i++) {
-            String query = (i == 0) ? selectedCategory.getRegion() + ' ' +  searchForm.getCategories()[i] : searchForm.getCategories()[i];
+            String query = (i == 0) ? region + searchForm.getCategories()[i] : searchForm.getCategories()[i];
             String x = (i == 0) ? null : placeList.get(i-1).getX();
             String y = (i == 0) ? null : placeList.get(i-1).getY();
             boolean isFirst = (i == 0);
