@@ -74,6 +74,8 @@ public class UserService {
         params.add("redirect_uri", "http://localhost:5173/login/oauth2/code/kakao");
         params.add("code", code);
 
+        System.out.println("kakao param: " + params.get("cliend_id"));
+
         HttpEntity<MultiValueMap<String, String>> kakaoTokenRequest =
                 new HttpEntity<>(params, headers);
 

@@ -1,18 +1,27 @@
 package capstone.courseweb.random.controller;
 
+import capstone.courseweb.ai.PreferenceService;
+import capstone.courseweb.jwt.config.JwtAuthProvider;
+import capstone.courseweb.jwt.utility.JwtIssuer;
 import capstone.courseweb.random.domain.SearchForm;
 import capstone.courseweb.random.domain.SelectedCategory;
 import capstone.courseweb.random.dto.PlaceDto;
 import capstone.courseweb.random.dto.RouteDto;
 import capstone.courseweb.random.service.RouteService;
 import capstone.courseweb.random.service.SearchByKeywordService;
+import capstone.courseweb.user.domain.Member;
+import capstone.courseweb.user.repository.MemberRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import netscape.javascript.JSObject;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -21,18 +30,53 @@ import java.util.*;
 @RestController
 @RequiredArgsConstructor
 public class PlaceSearchController {
+
+    private final JwtAuthProvider jwtAuthProvider;
     private final SearchByKeywordService searchService;
     private final RouteService routeService;
+    private final JwtIssuer jwtIssuer;
+    private final MemberRepository memberRepository;
 
     @PostMapping("/search/category")
     public ResponseEntity<Map<String, Object>> searchPlaces(
             @RequestBody SelectedCategory selectedCategory
             ) throws JsonProcessingException { //, @RequestHeader("Authorization")String token
 
+
+        // JWT 토큰 검증
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("error", "Invalid JWT token");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
+        }
+
+
+        String nickname = authentication.getName(); // 닉네임나옴
+        System.out.println("JWT 토큰 검증 받은 사용자 nickname: " + nickname);
+
+        Optional<Member> memberOpt = memberRepository.findByNickname(nickname);
+        if (memberOpt.isEmpty()) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("error", "User not found");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
+        }
+
+
         //jwt 토큰 검증
-        /**if (!jwtAuthProvider.validateToken(token.substring(7))) { //Bearer<토큰값>으로 전송되기 때문에 7번째 위치부터(토큰값만 추출)
-         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid JWT token"); //HTTP 401 Unauthorized 상태 코드를 반환
-         }**/
+        /*if (!jwtAuthProvider.validateToken(token.substring(7))) { //Bearer<토큰값>으로 전송되기 때문에 7번째 위치부터(토큰값만 추출)
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("error", "Invalid JWT token");
+
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
+            //return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid JWT token"); //HTTP 401 Unauthorized 상태 코드를 반환
+         }*/
+        //사용자 가져오기
+        /*Claims claims = jwtIssuer.getClaims(token);
+        String id = claims.get("id", String.class);
+        Optional<Member> memberOpt = memberRepository.findById(id);*/
+
+
 
         log.info("Region: " + selectedCategory.getRegion());
         log.info("Categories: " + selectedCategory.getCategories());
@@ -107,6 +151,7 @@ public class PlaceSearchController {
         placeInfo.add(names);
         placeInfo.add(longitudes);
         placeInfo.add(latitudes);
+        placeInfo.add(placeURL);
 
         System.out.println("placeInfo" + placeInfo);
 
@@ -115,6 +160,10 @@ public class PlaceSearchController {
         response.put("route", routes);
         response.put("info", placeInfo);
 
+        //데이터 수정 예시.
+        //Member member = memberOpt.get(); // Member 객체 가져오기
+        //member.setName("현조");
+        //memberRepository.save(member);
 
 
         return ResponseEntity.ok(response);
