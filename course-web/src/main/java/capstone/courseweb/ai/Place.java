@@ -1,10 +1,15 @@
-/*package capstone.courseweb.ai;
+package capstone.courseweb.ai;
 
 import jakarta.persistence.*;
+import lombok.*;
 
+@Builder
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-@Table(name = "places")
-public class PlaceEntity {
+@ToString
+public class Place {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer naver_id;
@@ -15,4 +20,4 @@ public class PlaceEntity {
     private String tag;
     private String address;
 
-}*/
+}

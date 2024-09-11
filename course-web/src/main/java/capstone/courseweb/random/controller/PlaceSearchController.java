@@ -1,6 +1,7 @@
 package capstone.courseweb.random.controller;
 
 import capstone.courseweb.random.domain.SearchForm;
+import capstone.courseweb.random.domain.SelectedCategory;
 import capstone.courseweb.random.dto.PlaceDto;
 import capstone.courseweb.random.dto.RouteDto;
 import capstone.courseweb.random.service.RouteService;
@@ -14,10 +15,7 @@ import org.json.JSONObject;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
 @RestController
@@ -26,20 +24,43 @@ public class PlaceSearchController {
     private final SearchByKeywordService searchService;
     private final RouteService routeService;
 
-    @GetMapping("/search/category")
+    @PostMapping("/search/category")
     public ResponseEntity<Map<String, Object>> searchPlaces(
-            @RequestParam String region,
-            @RequestParam List<String> categories) throws JsonProcessingException { //, @RequestHeader("Authorization")String token
+            @RequestBody SelectedCategory selectedCategory
+            ) throws JsonProcessingException { //, @RequestHeader("Authorization")String token
 
         //jwt 토큰 검증
         /**if (!jwtAuthProvider.validateToken(token.substring(7))) { //Bearer<토큰값>으로 전송되기 때문에 7번째 위치부터(토큰값만 추출)
          return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid JWT token"); //HTTP 401 Unauthorized 상태 코드를 반환
          }**/
 
-        log.info("Region: " + region);
-        log.info("Categories: " + categories);
+        log.info("Region: " + selectedCategory.getRegion());
+        log.info("Categories: " + selectedCategory.getCategories());
 
-        SearchForm searchForm = new SearchForm(region, categories.toArray(new String[0]));
+        /*
+        String[][] categoriesArray = new String[categories.size()][];
+        for (int i = 0; i<categoriesArray.length; i++) {
+            categoriesArray[i] = categories.get(i).toArray(new String[0]);
+        }
+
+         */
+
+        /*
+                Random random = new Random();
+        return places.get(random.nextInt(places.size()));
+         */
+        String[] categoriesFinal = new String[selectedCategory.getCategories().size()];
+
+        for (int i = 0; i<selectedCategory.getCategories().size(); i++) {
+            Random random = new Random();
+            // random.nextInt(categories.get(i).size())
+            categoriesFinal[i] = selectedCategory.getCategories().get(i).get(random.nextInt(selectedCategory.getCategories().get(i).size()));
+        }
+
+
+
+
+        SearchForm searchForm = new SearchForm(selectedCategory.getRegion(), categoriesFinal);
         List<PlaceDto> placeList = new ArrayList<>();
 
         log.info(searchForm.getLocal());
@@ -48,7 +69,7 @@ public class PlaceSearchController {
         }
 
         for (int i = 0; i < searchForm.getCategories().length; i++) {
-            String query = (i == 0) ? region + searchForm.getCategories()[i] : searchForm.getCategories()[i];
+            String query = (i == 0) ? selectedCategory.getRegion() + ' ' +  searchForm.getCategories()[i] : searchForm.getCategories()[i];
             String x = (i == 0) ? null : placeList.get(i-1).getX();
             String y = (i == 0) ? null : placeList.get(i-1).getY();
             boolean isFirst = (i == 0);
