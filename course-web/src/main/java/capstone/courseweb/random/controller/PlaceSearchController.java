@@ -40,9 +40,10 @@ public class PlaceSearchController {
     @PostMapping("/search/category")
     public ResponseEntity<Map<String, Object>> searchPlaces(
             @RequestBody SelectedCategory selectedCategory
-            ) throws JsonProcessingException { //, @RequestHeader("Authorization")String token
+    ) throws JsonProcessingException { //, @RequestHeader("Authorization")String token
 
 
+        //System.out.println("placesearchcontroller " + token);
         // JWT 토큰 검증
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
@@ -52,10 +53,11 @@ public class PlaceSearchController {
         }
 
 
-        String nickname = authentication.getName(); // 닉네임나옴
-        System.out.println("JWT 토큰 검증 받은 사용자 nickname: " + nickname);
+        String nickname = authentication.getName().toString(); // 닉네임나옴
+        System.out.println("서치카테고리: JWT 토큰 검증 받은 사용자 nickname: " + nickname);
 
         Optional<Member> memberOpt = memberRepository.findByNickname(nickname);
+        System.out.println("Optional<Member> memberOpt 닉네임: " + memberOpt.get());
         if (memberOpt.isEmpty()) {
             Map<String, Object> errorResponse = new HashMap<>();
             errorResponse.put("error", "User not found");
@@ -103,7 +105,6 @@ public class PlaceSearchController {
 
 
 
-
         SearchForm searchForm = new SearchForm(selectedCategory.getRegion(), categoriesFinal);
         List<PlaceDto> placeList = new ArrayList<>();
 
@@ -122,6 +123,7 @@ public class PlaceSearchController {
                     searchService.searchPlacesByKeyword(query, x, y, isFirst)));
         }
 
+        /*
         log.info("카카오맵까진 ok");
         log.info(placeList.get(0).getPlaceName());
         log.info(placeList.get(0).getY());
@@ -129,7 +131,7 @@ public class PlaceSearchController {
         log.info(placeList.get(1).getY());
         log.info(placeList.get(2).getPlaceName());
         log.info(placeList.get(2).getY());
-
+*/
 
 
         List<RouteDto> routes = routeService.findRoutesBetweenPlaces(placeList);
@@ -160,6 +162,8 @@ public class PlaceSearchController {
         response.put("route", routes);
         response.put("info", placeInfo);
 
+        System.out.println("플레이스 서치 response: " + response);
+
         //데이터 수정 예시.
         //Member member = memberOpt.get(); // Member 객체 가져오기
         //member.setName("현조");
@@ -167,7 +171,7 @@ public class PlaceSearchController {
 
 
         return ResponseEntity.ok(response);
-            //return ResponseEntity.ok(routes);
+        //return ResponseEntity.ok(routes);
         //return ResponseEntity.ok(placeList);
 
     }

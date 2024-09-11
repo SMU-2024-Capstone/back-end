@@ -73,6 +73,7 @@ public class SearchByKeywordService {
         List<PlaceDto> searchList = new ArrayList<>();
         for (int i = 0; i < 5; i++) {
             JSONObject documentObj = jsonArray.getJSONObject(i);
+            System.out.println("서치바이키워드서비스 카카오에서 장소 정보 받아오는: " + documentObj);
             searchList.add(
                     PlaceDto.builder()
                             .placeName(documentObj.getString("place_name"))
@@ -81,7 +82,7 @@ public class SearchByKeywordService {
                             .y(documentObj.getString("y"))
                             .placeURL(documentObj.getString("place_url"))
                             .categoryName(documentObj.getString("category_name"))
-                            .distance(documentObj.getString("distance"))
+                            //.distance(documentObj.getString("distance"))
                             .build());
         }
 

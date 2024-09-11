@@ -30,10 +30,16 @@ public class JwtFilter extends OncePerRequestFilter { //jwt 토큰 검증
                                     FilterChain filterChain) throws ServletException, IOException {
 
         String token = resolveTokenFromRequest(request);
+        System.out.println("jwt Filter token1: " + token);
+        //String only_token = token.substring(7);
+        //System.out.println("jwt Filter real token: " + token);
 
         if (!StringUtils.hasText(token)) {
             filterChain.doFilter(request, response);
             return;
+        } else {
+            token = token.substring(7);
+            System.out.println("token 7번째부터: " + token);
         }
 
         if (jwtAuthProvider.validateToken(token)) {
