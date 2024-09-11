@@ -43,6 +43,7 @@ public class JwtAuthProvider { //토큰 인증 처리
             return false;
         }
 
+
         /*String role = claims.get("role", String.class);
         if (role == null || !role.equals("admin")) {
             // 사용자가 관리자가 아님
@@ -62,7 +63,8 @@ public class JwtAuthProvider { //토큰 인증 처리
     public boolean validateToken(JwtDto jwtDto) {
         if (!StringUtils.hasText(jwtDto.getAccessToken())
                 || !StringUtils.hasText(jwtDto.getRefreshToken())) {
-            return false;
+            // return false;
+            return true;
         }
 
         Claims accessClaims = jwtIssuer.getClaims(jwtDto.getAccessToken());

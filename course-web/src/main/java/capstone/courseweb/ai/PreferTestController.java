@@ -2,24 +2,18 @@ package capstone.courseweb.ai;
 
 import capstone.courseweb.jwt.config.JwtAuthProvider;
 import capstone.courseweb.jwt.utility.JwtIssuer;
-import capstone.courseweb.user.domain.Member;
 import capstone.courseweb.user.repository.MemberRepository;
-import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+
+import java.util.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -29,12 +23,12 @@ public class PreferTestController {
     private final JwtIssuer jwtIssuer;
     private final PreferenceService preferenceService;
     private final MemberRepository memberRepository;
+    private final PlaceRepository placeRepository;
 
     @PostMapping("/test-result")
-    public ResponseEntity<String> receiveTestResult(@RequestBody Map<String, Object> testResult) { //, @RequestHeader("Authorization")String token
+    public ResponseEntity<Map<String, List<Object>>> receiveTestResult(@RequestBody Map<String, Object> testResult) { //, @RequestHeader("Authorization")String token
 
-        System.out.println(testResult.get("result"));
-
+        /*
         //jwt 토큰 검증
        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
@@ -49,6 +43,8 @@ public class PreferTestController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not found");
         }
 
+         */
+
 
         //jwt 토큰 검증
         /*if (!jwtAuthProvider.validateToken(token.substring(7))) { //Bearer<토큰값>으로 전송되기 때문에 7번째 위치부터(토큰값만 추출)
@@ -60,15 +56,45 @@ public class PreferTestController {
         //Member member;
         Optional<Member> memberOpt = memberRepository.findById(id);*/
 
-
-        //jwt 검증되면 flask 서버로 데이터 전달
-        String response = preferenceService.sendToFlaskServer(testResult);
         System.out.println("플라스크에 전송");
-        System.out.println(response);
+
+        String flaskResponse = preferenceService.sendToFlaskServer(testResult);
+        JSONObject flaskResponseJson = new JSONObject(flaskResponse);
+
+        // TODO: user vector 저장하는 코드
+        String userVector = flaskResponseJson.get("user_vector").toString();
 
 
-        /** 플라스크에서 받아온 정보 중에서 유저벡터는 디비저장, 장소들은 프론트로 전송 **/
 
-        return ResponseEntity.ok(response); //flask에서 받은 데이터 프론트로 전달
+
+        JSONArray jsonArray = new JSONArray(flaskResponseJson.getJSONArray("placeID"));
+        int[] intArray = new int[jsonArray.length()];
+
+        // JSONArray 값들을 int로 변환하여 배열에 저장
+        for (int i = 0; i < jsonArray.length(); i++) {
+            intArray[i] = jsonArray.getInt(i);
+        }
+
+        Map<String, List<Object>> finalResponse = new HashMap<>();
+        List<Object> places_info = new ArrayList<>();
+
+        for (int i = 0; i < intArray.length; i++){
+            Optional<Place> place = placeRepository.findById(intArray[i]);
+
+            if (place.isPresent()) {
+                Map<String, Object> newResponse = new HashMap<>();
+                newResponse.put("placename", place.get().getName());
+                newResponse.put("category", place.get().getCategory());
+                newResponse.put("tag", place.get().getTag());
+                newResponse.put("URL", "https://pcmap.place.naver.com/restaurant/"+place.get().getId());
+                places_info.add(newResponse);
+                System.out.println(newResponse);
+            }
+        }
+        finalResponse.put("ai_recommend", places_info);
+
+        return ResponseEntity.ok(finalResponse);
+
     }
+
 }

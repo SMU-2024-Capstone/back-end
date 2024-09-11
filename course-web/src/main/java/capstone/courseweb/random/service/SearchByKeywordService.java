@@ -20,6 +20,7 @@ import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 
 @Service
@@ -41,7 +42,7 @@ public class SearchByKeywordService {
     }
 
 
-    public List<PlaceDto> searchPlacesByKeyword(String query, String x, String y, boolean isFirst) throws JsonProcessingException {
+    public Optional<PlaceDto>  searchPlacesByKeyword(String query, String x, String y, boolean isFirst) throws JsonProcessingException {
         URI tmp;
         if(isFirst) {
             tmp =
@@ -70,24 +71,33 @@ public class SearchByKeywordService {
         System.out.println("카카오맵 api documents" + response);
         JSONArray jsonArray = jsonObject.getJSONArray("documents");
 
-        List<PlaceDto> searchList = new ArrayList<>();
-        for (int i = 0; i < 5; i++) {
-            JSONObject documentObj = jsonArray.getJSONObject(i);
-            System.out.println("서치바이키워드서비스 카카오에서 장소 정보 받아오는: " + documentObj);
-            searchList.add(
-                    PlaceDto.builder()
-                            .placeName(documentObj.getString("place_name"))
-                            .addressName(documentObj.getString("address_name"))
-                            .x(documentObj.getString("x"))
-                            .y(documentObj.getString("y"))
-                            .placeURL(documentObj.getString("place_url"))
-                            .categoryName(documentObj.getString("category_name"))
-                            //.distance(documentObj.getString("distance"))
-                            .build());
+
+        if (jsonArray.length() == 0) {
+            return Optional.empty();
+
         }
 
-        System.out.println("장소 사이 거리: " + searchList.get(0).getDistance());
-        return searchList;
+        Random random = new Random();
+        int randomInt = 0;
+
+        if (jsonArray.length() >= 5) {
+            randomInt = random.nextInt(5);
+        }
+        else {
+            randomInt = random.nextInt(jsonArray.length());
+        }
+        JSONObject documentObj = jsonArray.getJSONObject(randomInt);
+        PlaceDto placeDto = PlaceDto.builder()
+                .placeName(documentObj.getString("place_name"))
+                .addressName(documentObj.getString("address_name"))
+                .x(documentObj.getString("x"))
+                .y(documentObj.getString("y"))
+                .placeURL(documentObj.getString("place_url"))
+                .categoryName(documentObj.getString("category_name"))
+                .distance(documentObj.getString("distance"))
+                .build();
+
+        return Optional.of(placeDto);
     }
 
     public PlaceDto getRandomPlace(List<PlaceDto> places) throws JsonProcessingException {
