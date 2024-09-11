@@ -2,8 +2,12 @@ package capstone.courseweb.jwt.config;
 
 import capstone.courseweb.jwt.JwtDto;
 import capstone.courseweb.jwt.utility.JwtIssuer;
+import capstone.courseweb.user.domain.Member;
+import capstone.courseweb.user.repository.MemberRepository;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -12,6 +16,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import java.util.Date;
+import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
@@ -19,6 +24,8 @@ public class JwtAuthProvider { //토큰 인증 처리
 
     private final UserDetailsService userDetailsService;
     private final JwtIssuer jwtIssuer;
+
+    private final MemberRepository memberRepository;
 
     public boolean validateToken(String token) { //인증
         if (!StringUtils.hasText(token)) {
@@ -28,6 +35,7 @@ public class JwtAuthProvider { //토큰 인증 처리
         if (claims == null) {
             return false;
         }
+
 
         Date expirationDate = claims.getExpiration();
         if (expirationDate != null && expirationDate.before(new Date())) {

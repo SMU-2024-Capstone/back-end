@@ -13,23 +13,34 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Date;
+
 
 @RestController
 @RequiredArgsConstructor
 public class RefreshTokenController {
     private final JwtAuthProvider jwtAuthProvider;
     private final JwtIssuer jwtIssuer;
-    private final MemberRepository memberRepository;
 
-    @PostMapping("/refresh-token")
+    @PostMapping("/access-token-recreate")
     public ResponseEntity<JwtDto> refreshToken(@RequestBody JwtDto jwtDto) {
         //JWT Dto로 accesstoken과 refreshtoken 검증
         if (!jwtAuthProvider.validateToken(jwtDto)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
 
+        // 리프레시 토큰 만료 확인
+        Claims refreshClaims = jwtIssuer.getClaims(jwtDto.getRefreshToken());
+        Date refreshExpirationDate = refreshClaims.getExpiration();
+        if (refreshExpirationDate.before(new Date())) {
+            // 리프레시 토큰이 만료된 경우 401 Unauthorized를 반환
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+
+
+
         Claims accessClaims = jwtIssuer.getClaims(jwtDto.getAccessToken());
-        String userId = accessClaims.get("id", String.class);
+        //String userId = accessClaims.get("id", String.class);
         //둘 다 유효하면 새 토큰 생성
         String newAccessToken = String.valueOf(jwtIssuer.createToken(
                 accessClaims.get("id", String.class),
