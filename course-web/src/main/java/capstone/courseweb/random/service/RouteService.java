@@ -82,15 +82,39 @@ public class RouteService {
         // 에러 코드가 -98인 경우 result에 "도보" 추가
         if (jsonObject.has("error")) {
             System.out.println("Error field exists");
-            JSONArray errorAJson = jsonObject.getJSONArray("error");
+
+            if (jsonObject.get("error") instanceof JSONObject) {
+                JSONObject errorJson = jsonObject.getJSONObject("error");
+                if (errorJson.getString("code").equals("-98")) {
+                    jsonObject.put("result", "도보");
+                }
+            } else if (jsonObject.get("error") instanceof JSONArray) {
+                JSONArray errorAJson = jsonObject.getJSONArray("error");
+                System.out.println("Error JSONObject: " + errorAJson.getJSONObject(0).toString());
+            }
+            return jsonObject.toString();
+
+
+            /*if (jsonObject.get("error") instanceof JSONObject ) {
+                if (jsonObject.getString("code").equals("-98")) {
+                    jsonObject.put("result", "도보");
+                    return jsonObject.toString();
+                }
+            } else if (jsonObject.get("error") instanceof JSONArray) {
+                JSONArray errorAJson = jsonObject.getJSONArray("error");
+                JSONObject errorJson = errorAJson.getJSONObject(0);
+                // JSONObject errorJson = jsonObject.getJSONObject("error");
+                System.out.println("Error JSONObject: " + errorJson.toString());
+            }*/
+            /*JSONArray errorAJson = jsonObject.getJSONArray("error");
             JSONObject errorJson = errorAJson.getJSONObject(0);
             // JSONObject errorJson = jsonObject.getJSONObject("error");
-            System.out.println("Error JSONObject: " + errorJson.toString());
+            System.out.println("Error JSONObject: " + errorJson.toString());*/
 
-            if (errorJson.getString("code").equals("-98")) {
+            /*if (errorJson.getString("code").equals("-98")) {
                 jsonObject.put("result", "도보");
                 return jsonObject.toString();
-            }
+            }*/
 
             //System.out.println("에러코드 -98: " + result);
         }

@@ -38,12 +38,12 @@ public class JwtIssuer {
         SECRET_KEY = Base64.getEncoder().encodeToString(SECRET_KEY.getBytes());
     }
 
-    public JwtDto createToken(String userId, String userName, String nickname) { //id, name, role로 토큰 생성
+    public JwtDto createToken(String userId, String userName) { //소셜id, 소셜 name으로
         String encryptedId = aes256Util.encrypt(userId);
         Claims claims = Jwts.claims().setSubject(encryptedId); //claim: jwt에 포함될 정보
         claims.put("id", userId);
         claims.put("name", userName);
-        claims.put("nickname", nickname);
+        //claims.put("nickname", nickname);
         //claims.put(KEY_ROLES, role);
 
         Date now = new Date();
@@ -77,6 +77,7 @@ public class JwtIssuer {
     }
 
     public Claims getClaims(String token) {
+        System.out.println("getclaim 실행, token 출력" + token.toString());
         Claims claims;
         try {
             claims = Jwts.parser()
@@ -89,6 +90,7 @@ public class JwtIssuer {
         }catch (ExpiredJwtException e) {
             claims = e.getClaims();
         }catch (Exception e) {
+            //System.out.println("getclaim " + claims);
             throw new BadCredentialsException("유효한 토큰이 아닙니다.");
         }
         return claims;
