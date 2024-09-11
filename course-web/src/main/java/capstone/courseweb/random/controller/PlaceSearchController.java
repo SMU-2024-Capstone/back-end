@@ -41,7 +41,7 @@ public class PlaceSearchController {
     public ResponseEntity<Map<String, Object>> searchPlaces(
             @RequestBody SelectedCategory selectedCategory
             ) throws JsonProcessingException { //, @RequestHeader("Authorization")String token
-
+        System.out.println("search/category 진입 성공");
 
         // JWT 토큰 검증
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

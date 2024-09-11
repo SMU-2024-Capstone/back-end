@@ -1,8 +1,5 @@
 package capstone.courseweb.ai;
 
-import capstone.courseweb.user.domain.Member;
-import capstone.courseweb.user.repository.MemberRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -11,7 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Map;
-import java.util.Optional;
+import java.util.Objects;
 
 @Service
 public class PreferenceService {
@@ -27,6 +24,7 @@ public class PreferenceService {
         HttpEntity<Map<String, Object>> request = new HttpEntity<>(testResult, headers);
 
         ResponseEntity<String> response = restTemplate.postForEntity(flaskUrl, request, String.class);
+
         return response.getBody();
     }
 
