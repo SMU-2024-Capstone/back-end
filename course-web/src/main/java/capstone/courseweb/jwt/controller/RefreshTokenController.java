@@ -44,8 +44,8 @@ public class RefreshTokenController {
         //둘 다 유효하면 새 토큰 생성
         String newAccessToken = String.valueOf(jwtIssuer.createToken(
                 accessClaims.get("id", String.class),
-                accessClaims.get("name", String.class),
-                accessClaims.get("nickname", String.class)
+                accessClaims.get("name", String.class)
+                //accessClaims.get("nickname", String.class)
         ));
 
         JwtDto newTokens = JwtDto.builder()

@@ -41,10 +41,11 @@ public class PlaceSearchController {
     @PostMapping("/search/category")
     public ResponseEntity<Map<String, Object>> searchPlaces(
             @RequestBody SelectedCategory selectedCategory
-            ) throws JsonProcessingException { //, @RequestHeader("Authorization")String token
-        System.out.println("search/category 진입 성공");
+    ) throws JsonProcessingException { //, @RequestHeader("Authorization")String token
 
-        /*
+
+        //System.out.println("placesearchcontroller " + token);
+
         // JWT 토큰 검증
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
@@ -55,10 +56,12 @@ public class PlaceSearchController {
         }
 
 
-        String nickname = authentication.getName(); // 닉네임나옴
-        System.out.println("JWT 토큰 검증 받은 사용자 nickname: " + nickname);
+        String nickname = authentication.getName().toString(); // 닉네임나옴
+        System.out.println("서치카테고리: JWT 토큰 검증 받은 사용자 nickname: " + nickname);
 
         Optional<Member> memberOpt = memberRepository.findByNickname(nickname);
+
+        System.out.println("Optional<Member> memberOpt 닉네임: " + memberOpt.get());
 
         if (memberOpt.isEmpty()) {
             Map<String, Object> errorResponse = new HashMap<>();
@@ -107,7 +110,6 @@ public class PlaceSearchController {
             // random.nextInt(categories.get(i).size())
             categoriesFinal[i] = selectedCategory.getCategories().get(i).get(random.nextInt(selectedCategory.getCategories().get(i).size()));
         }
-
 
 
 
@@ -165,6 +167,8 @@ public class PlaceSearchController {
         response.put("route", routes);
         response.put("info", placeInfo);
 
+        System.out.println("플레이스 서치 response: " + response);
+
         //데이터 수정 예시.
         //Member member = memberOpt.get(); // Member 객체 가져오기
         //member.setName("현조");
@@ -172,7 +176,7 @@ public class PlaceSearchController {
 
 
         return ResponseEntity.ok(response);
-            //return ResponseEntity.ok(routes);
+        //return ResponseEntity.ok(routes);
         //return ResponseEntity.ok(placeList);
 
     }

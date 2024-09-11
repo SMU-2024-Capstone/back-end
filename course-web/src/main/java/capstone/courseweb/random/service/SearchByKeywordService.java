@@ -71,8 +71,10 @@ public class SearchByKeywordService {
         System.out.println("카카오맵 api documents" + response);
         JSONArray jsonArray = jsonObject.getJSONArray("documents");
 
+
         if (jsonArray.length() == 0) {
             return Optional.empty();
+
         }
 
         Random random = new Random();
