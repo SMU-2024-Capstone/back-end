@@ -28,7 +28,9 @@ public class UserController {
 
     @GetMapping("/user/callback/kakao")
     public ResponseEntity<String> kakaoLogin(@RequestParam("code") String code) throws JsonProcessingException {
+
         System.out.println("프론트에서 받은 인가 코드" + code);
+
         kakaoUserForm = userService.getUserInfo(code);
         log.info("Email: {}, ID: {}, Name: {}, Provider: {}", kakaoUserForm.getEmail(), kakaoUserForm.getId(), kakaoUserForm.getName());
 

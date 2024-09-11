@@ -82,7 +82,9 @@ public class RouteService {
         // 에러 코드가 -98인 경우 result에 "도보" 추가
         if (jsonObject.has("error")) {
             System.out.println("Error field exists");
-            JSONObject errorJson = jsonObject.getJSONObject("error");
+            JSONArray errorAJson = jsonObject.getJSONArray("error");
+            JSONObject errorJson = errorAJson.getJSONObject(0);
+            // JSONObject errorJson = jsonObject.getJSONObject("error");
             System.out.println("Error JSONObject: " + errorJson.toString());
 
             if (errorJson.getString("code").equals("-98")) {
