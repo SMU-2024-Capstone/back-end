@@ -4,6 +4,7 @@ package capstone.courseweb.user.domain;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -11,6 +12,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.Collections;
 
+@Slf4j
 @Getter
 @Setter
 @NoArgsConstructor
@@ -38,11 +40,12 @@ public class Member implements UserDetails {
     @Column(nullable = false)
     private MemberProvider provider;*/
 
+
     @Override
     @JsonIgnore
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        System.out.println("getAuthorities 에서 닉네임 출려기" + this.nickname);
-        return Collections.singleton(new SimpleGrantedAuthority(this.nickname));
+        log.info("getAuthorities 에서 id 출력: {}", this.getId());
+        return Collections.singleton(new SimpleGrantedAuthority(this.getId()));
     }
 
     @Override

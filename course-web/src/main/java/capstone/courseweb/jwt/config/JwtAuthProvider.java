@@ -6,6 +6,7 @@ import capstone.courseweb.user.domain.Member;
 import capstone.courseweb.user.repository.MemberRepository;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -18,6 +19,7 @@ import org.springframework.util.StringUtils;
 import java.util.Date;
 import java.util.Optional;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class JwtAuthProvider { //토큰 인증 처리
@@ -75,8 +77,12 @@ public class JwtAuthProvider { //토큰 인증 처리
     }
 
     public Authentication getAuthentication(String token) {
+        log.info("getAuthentication에서 토큰 잘 받나 확인: {}", token);
+
         Claims claims = jwtIssuer.getClaims(token);
-        String id = jwtIssuer.getSubject(claims); //userid
+        String id = claims.get("id").toString();//소셜id나와야됨
+        //String id = jwtIssuer.getSubject(claims); //userid
+        log.info("token으로 가져온 클레임의 id(소셜 id여야함.): {}", id);
         UserDetails userDetails = userDetailsService.loadUserByUsername(id);
 
         return new UsernamePasswordAuthenticationToken(userDetails, null,

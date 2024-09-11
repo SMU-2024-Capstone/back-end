@@ -77,7 +77,7 @@ public class JwtIssuer {
     }
 
     public Claims getClaims(String token) {
-        System.out.println("getclaim 실행, token 출력" + token.toString());
+        log.info("getclaim 실행, token 출력: {}", token);
         Claims claims;
         try {
             claims = Jwts.parser()
@@ -85,7 +85,7 @@ public class JwtIssuer {
                     //.build
                     .parseClaimsJws(token).getBody();
 
-            log.info("claim 복호화 확인", claims.get("id", String.class));
+            log.info("claim 복호화 확인: {}", claims.get("id"));
 
         }catch (ExpiredJwtException e) {
             claims = e.getClaims();
