@@ -19,7 +19,7 @@ public class PreferenceService {
     public String sendToFlaskServer(Map<String, Object> testResult) {
         // RestTemplate 사용해 Flask 서버로 POST 요청
         RestTemplate restTemplate = new RestTemplate();
-        String flaskUrl = "http://localhost:5000/api/process";  // Flask 서버 주소
+        String flaskUrl = "http://127.0.0.1:5000/test-result/calc";  // Flask 서버 주소
 
         //Flask 서버로 보낼 요청 설정
         HttpHeaders headers = new HttpHeaders();

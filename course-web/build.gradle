@@ -26,6 +26,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'com.h2database:h2'
+	// implementation 'com.h2database:h2'
 	annotationProcessor 'org.projectlombok:lombok'
 
 	implementation 'org.springframework.boot:spring-boot-starter-security'
@@ -43,6 +44,9 @@ dependencies {
 
 	// json
 	implementation group: 'org.json', name: 'json', version: '20240303'
+
+	// csv 파일 읽기
+	// implementation 'org.springframework.boot:spring-boot-starter-batch'
 
 
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
