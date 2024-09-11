@@ -28,8 +28,9 @@ public class UserController {
 
     @GetMapping("/user/callback/kakao")
     public ResponseEntity<String> kakaoLogin(@RequestParam("code") String code) throws JsonProcessingException {
+        System.out.println("프론트에서 받은 인가 코드" + code);
         kakaoUserForm = userService.getUserInfo(code);
-        log.info("Email: {}, ID: {}, Name: {}, Provider: {}", kakaoUserForm.getEmail(), kakaoUserForm.getId(), kakaoUserForm.getName()); //, kakaoUserForm.getProvider()
+        log.info("Email: {}, ID: {}, Name: {}, Provider: {}", kakaoUserForm.getEmail(), kakaoUserForm.getId(), kakaoUserForm.getName());
 
         if (memberRepository.existsById(kakaoUserForm.getId())) { //db에 회원정보 있을 때
             return ResponseEntity.ok("로그인");
@@ -48,6 +49,7 @@ public class UserController {
             log.info("닉네임 중복");
             return ResponseEntity.ok("닉네임 중복");
         } else { //닉네임 중복 아닐 때
+            System.out.println("kakaoUserForm에 소셜 id가 들어있는지 " + kakaoUserForm.getId());
             kakaoUserForm.setNickname(nickname);
             //카카오 아이디, 카카오 닉네임, 이길로 닉네임으로 jwt 토큰 생성
             JwtDto kakaoJwtToken = jwtIssuer.createToken(kakaoUserForm.getId(), kakaoUserForm.getName(), kakaoUserForm.getNickname());

@@ -18,7 +18,7 @@ import java.io.IOException;
 
 @Component
 @RequiredArgsConstructor
-public class JwtFilter extends OncePerRequestFilter {
+public class JwtFilter extends OncePerRequestFilter { //jwt 토큰 검증
 
     private final JwtAuthProvider jwtAuthProvider;
     public static final String JWT_HEADER_KEY = "Authorization";

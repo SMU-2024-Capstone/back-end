@@ -28,11 +28,15 @@ public class MemberService implements UserDetailsService {
             //memberRepository.deleteAll();
             throw new RuntimeException("사용중인 이메일입니다.");
         }
+        System.out.println("signup 직전 id: " + form.getId());
+        System.out.println("signup 직전 nickname: " + form.getNickname());
+        System.out.println("signup 직전 refresh: " + form.getRefresh_token());
 
         return memberRepository.save(Member.builder()
                 .email(form.getEmail())
                 .Id(form.getId())//passwordEncoder.encode(form.getId())
                 .name(form.getName())
+                .nickname(form.getNickname())
                 //.provider(Member.MemberProvider.LOCAL)
                 .refresh_token(form.getRefresh_token())
                 .build());

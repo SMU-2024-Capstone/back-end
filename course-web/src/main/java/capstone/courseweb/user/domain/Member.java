@@ -20,7 +20,7 @@ import java.util.Collections;
 public class Member implements UserDetails {
     @Id
     @Column(nullable = false, unique = true)
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    //@GeneratedValue(strategy = GenerationType.IDENTITY)
     private String Id; //소셜id
 
     private String email;
@@ -41,6 +41,7 @@ public class Member implements UserDetails {
     @Override
     @JsonIgnore
     public Collection<? extends GrantedAuthority> getAuthorities() {
+        System.out.println("getAuthorities 에서 닉네임 출려기" + this.nickname);
         return Collections.singleton(new SimpleGrantedAuthority(this.nickname));
     }
 
