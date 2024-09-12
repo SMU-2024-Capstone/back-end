@@ -30,77 +30,19 @@ import java.util.*;
 @RestController
 @RequiredArgsConstructor
 public class PlaceSearchController {
-
-    private final JwtAuthProvider jwtAuthProvider;
     private final SearchByKeywordService searchService;
     private final RouteService routeService;
-    private final JwtIssuer jwtIssuer;
-    private final MemberRepository memberRepository;
 
 
     @PostMapping("/search/category")
     public ResponseEntity<Map<String, Object>> searchPlaces(
             @RequestBody SelectedCategory selectedCategory
     ) throws JsonProcessingException { //, @RequestHeader("Authorization")String token
-
-
-        //System.out.println("placesearchcontroller " + token);
-
-        // JWT 토큰 검증
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        if (authentication == null || !authentication.isAuthenticated()) {
-            Map<String, Object> errorResponse = new HashMap<>();
-            errorResponse.put("error", "Invalid JWT token");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
-        }
-
-
-        String nickname = authentication.getName().toString(); // 닉네임나옴
-        System.out.println("서치카테고리: JWT 토큰 검증 받은 사용자 nickname: " + nickname);
-
-        Optional<Member> memberOpt = memberRepository.findByNickname(nickname);
-
-        System.out.println("Optional<Member> memberOpt 닉네임: " + memberOpt.get().getNickname());
-
-        if (memberOpt.isEmpty()) {
-            Map<String, Object> errorResponse = new HashMap<>();
-            errorResponse.put("error", "User not found");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
-        }
-
-
-        //jwt 토큰 검증
-        /*if (!jwtAuthProvider.validateToken(token.substring(7))) { //Bearer<토큰값>으로 전송되기 때문에 7번째 위치부터(토큰값만 추출)
-            Map<String, Object> errorResponse = new HashMap<>();
-            errorResponse.put("error", "Invalid JWT token");
-
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
-            //return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid JWT token"); //HTTP 401 Unauthorized 상태 코드를 반환
-         }*/
-        //사용자 가져오기
-        /*Claims claims = jwtIssuer.getClaims(token);
-        String id = claims.get("id", String.class);
-        Optional<Member> memberOpt = memberRepository.findById(id);*/
-
-
-
+        
 
         log.info("Region: " + selectedCategory.getRegion());
         log.info("Categories: " + selectedCategory.getCategories());
 
-        /*
-        String[][] categoriesArray = new String[categories.size()][];
-        for (int i = 0; i<categoriesArray.length; i++) {
-            categoriesArray[i] = categories.get(i).toArray(new String[0]);
-        }
-
-         */
-
-        /*
-                Random random = new Random();
-        return places.get(random.nextInt(places.size()));
-         */
         String[] categoriesFinal = new String[selectedCategory.getCategories().size()];
 
         for (int i = 0; i<selectedCategory.getCategories().size(); i++) {
