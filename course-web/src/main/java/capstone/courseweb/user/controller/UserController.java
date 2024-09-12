@@ -75,11 +75,11 @@ public class UserController {
             memberService.signUp(kakaoUserForm);
 
             /**프론트랑 연결해보려고 return 값 바꿈**/
-            //Map<String, Object> response = new HashMap<>();
-            //response.put("status", HttpStatus.CREATED.value());
-            //response.put("token", kakaoJwtToken);
-            //return ResponseEntity.ok(response);
-            return ResponseEntity.ok(kakaoJwtToken);
+            Map<String, Object> response = new HashMap<>();
+            response.put("status", HttpStatus.CREATED.value());
+            response.put("token", kakaoJwtToken);
+            return ResponseEntity.ok(response);
+            //return ResponseEntity.ok(kakaoJwtToken);
         }
     }
 
@@ -94,6 +94,8 @@ public class UserController {
             errorResponse.put("error", "Invalid JWT token");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
         }
+
+        log.info("authentication.getPrincipal값 확인: {]", authentication.getPrincipal());
 
         //사용자 정보 가져오기
         Member member = (Member) authentication.getPrincipal();
