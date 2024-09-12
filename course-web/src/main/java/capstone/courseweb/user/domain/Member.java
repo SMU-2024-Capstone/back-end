@@ -105,5 +105,7 @@ public class Member implements UserDetails {
 
     private String refresh_token;
 
+    @Column(length = 1500)
     private String user_vector;
+
 }
