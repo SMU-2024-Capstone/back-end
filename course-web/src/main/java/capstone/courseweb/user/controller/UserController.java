@@ -42,16 +42,41 @@ public class UserController {
         kakaoUserForm = userService.getUserInfo(code);
         log.info("Email: {}, ID: {}, Name: {}, Provider: {}", kakaoUserForm.getEmail(), kakaoUserForm.getId(), kakaoUserForm.getName());
 
-        if (memberRepository.existsById(kakaoUserForm.getId())) { //db에 회원정보 있을 때
-            return ResponseEntity.ok("로그인");
+        Optional<Member> memberOpt = memberRepository.findById(kakaoUserForm.getId());
+
+        if (memberOpt.isPresent()) { //db에 회원정보 있을 때
+            Member user = memberOpt.get();
+            if (user.getNickname()==null) { // 닉네임 없으면 닉네임 화면으로
+                Map<String, Object> response = new HashMap<>();
+                response.put("status", HttpStatus.OK.value());
+                response.put("message", "닉네임 없음");
+                return ResponseEntity.ok(response);
+            } else { //닉네임 있으면 유저벡터 있는지 확인
+                if (user.getUser_vector()==null) { //유저벡터 없으면 선호도 테스트 화면으로
+                    Map<String, Object> response = new HashMap<>();
+                    response.put("status", HttpStatus.OK.value());
+                    response.put("message", "선호도 테스트");
+                    return ResponseEntity.ok(response);
+                } else { //유저벡터까지 있으면 회원가입 완료 -> 홈화면
+                    Map<String, Object> response = new HashMap<>();
+                    response.put("status", HttpStatus.OK.value());
+                    response.put("message", "홈화면");
+                    return ResponseEntity.ok(response);
+                }
+            }
+
         }
         else { //db에 회원정보 없을 때
             JwtDto kakaoJwtToken = jwtIssuer.createToken(kakaoUserForm.getId(), kakaoUserForm.getName());
             kakaoUserForm.setRefresh_token(kakaoJwtToken.getRefreshToken());
-            //memberService.signUp(kakaoUserForm);
+            memberService.signUp(kakaoUserForm);
 
+            /**프론트랑 연결해보려고 return 값 바꿈**/
+            //Map<String, Object> response = new HashMap<>();
+            //response.put("status", HttpStatus.CREATED.value());
+            //response.put("token", kakaoJwtToken);
+            //return ResponseEntity.ok(response);
             return ResponseEntity.ok(kakaoJwtToken);
-            //return ResponseEntity.ok("회원가입. 닉네임 설정으로 이동");
         }
     }
 
@@ -59,7 +84,6 @@ public class UserController {
     @PostMapping("/user/nickname")
     public ResponseEntity<?> nicknameCheck(@RequestBody NicknameController nicknameRequest) {
 
-        /*
         // JWT 토큰 검증
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
@@ -68,54 +92,38 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
         }
 
-         */
-
-
-        //닉네임 말고 id 받아오기
-        /*System.out.println("1닉네임 컨트롤러 - authentication.getPrinciple: " + authentication.getPrincipal().toString());
-        //System.out.println("2닉네임 컨트롤러 - authentication.getPrinciple: " + (Member) authentication.getPrincipal());
-        System.out.println("3닉네임 컨트롤러 - authentication.getPrinciple: " + ((Member) authentication.getPrincipal()).getId());
+        //사용자 정보 가져오기
         Member member = (Member) authentication.getPrincipal();
         String id = member.getId();
-        System.out.println("서치 화면 jwt로 사용자 아이디 가져오기: " + id);
-
-
         Optional<Member> memberOpt = memberRepository.findById(id);
         if (memberOpt.isEmpty()) {
             Map<String, Object> errorResponse = new HashMap<>();
             errorResponse.put("error", "User not found");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
         }
-*/
+        
 
         String nickname = nicknameRequest.getNickname();
         log.info("닉네임: " + nickname);
         if (memberRepository.existsByNickname(nickname)) {
-            log.info("닉네임 중복");
-            return ResponseEntity.ok("닉네임 중복");
+            Map<String, Object> response = new HashMap<>();
+            response.put("status", HttpStatus.OK.value());
+            response.put("message", "닉네임 중복");
+            return ResponseEntity.ok(response);
         } else { //닉네임 중복 아닐 때
-            //System.out.println("kakaoUserForm에 소셜 id가 들어있는지 " + kakaoUserForm.getId());
-            //kakaoUserForm.setNickname(nickname);
-
-
-            /**Member user = memberOpt.get(); // 지금 접근한 사용자 Member 객체 가져오기
-            member.setNickname(nickname);
-            memberRepository.save(member);**/
-
-
             kakaoUserForm.setNickname(nickname);
-            memberService.signUp(kakaoUserForm);
 
-            //카카오 아이디, 카카오 닉네임, 이길로 닉네임으로 jwt 토큰 생성
-            //JwtDto kakaoJwtToken = jwtIssuer.createToken(kakaoUserForm.getId(), kakaoUserForm.getName(), kakaoUserForm.getNickname());
-            //kakaoUserForm.setRefresh_token(kakaoJwtToken.getRefreshToken());
+            //닉네임 저장
+            Member user = memberOpt.get();
+            user.setNickname(nickname);
+            memberRepository.save(user);
 
-            //String userId = JwtUtil.extractUserId(token);
+            log.info("유저 컨트롤러 nickname 출력: {}", nickname);
 
-            log.info("닉네임 저장");
-            //log.info("access token: {}, refresh token: {}", kakaoJwtToken.getAccessToken(), kakaoJwtToken.getRefreshToken());
-            //return ResponseEntity.ok(kakaoJwtToken);
-            return ResponseEntity.ok("닉네임 저장");
+            Map<String, Object> response = new HashMap<>();
+            response.put("status", HttpStatus.OK.value());
+            response.put("message", "닉네임 사용 가능");
+            return ResponseEntity.ok(response);
         }
     }
 

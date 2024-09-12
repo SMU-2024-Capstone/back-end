@@ -70,8 +70,6 @@ public class PlaceSearchController {
         }
 
 
-
-
         //jwt 토큰 검증
         /*if (!jwtAuthProvider.validateToken(token.substring(7))) { //Bearer<토큰값>으로 전송되기 때문에 7번째 위치부터(토큰값만 추출)
             Map<String, Object> errorResponse = new HashMap<>();
