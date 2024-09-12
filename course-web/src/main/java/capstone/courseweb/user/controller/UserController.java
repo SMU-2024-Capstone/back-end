@@ -59,6 +59,7 @@ public class UserController {
     @PostMapping("/user/nickname")
     public ResponseEntity<?> nicknameCheck(@RequestBody NicknameController nicknameRequest) {
 
+        /*
         // JWT 토큰 검증
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
@@ -66,6 +67,8 @@ public class UserController {
             errorResponse.put("error", "Invalid JWT token");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
         }
+
+         */
 
 
         //닉네임 말고 id 받아오기

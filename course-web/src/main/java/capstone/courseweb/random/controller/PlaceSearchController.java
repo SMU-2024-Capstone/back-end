@@ -69,7 +69,7 @@ public class PlaceSearchController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
         }
 
-         */
+
 
 
         //jwt 토큰 검증

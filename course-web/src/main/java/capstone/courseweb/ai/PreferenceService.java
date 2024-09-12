@@ -13,7 +13,7 @@ import java.util.Objects;
 @Service
 public class PreferenceService {
 
-    public String sendToFlaskServer(Map<String, Object> testResult) {
+    public String sendResultToFlaskServer(Map<String, Object> testResult) {
         // RestTemplate 사용해 Flask 서버로 POST 요청
         RestTemplate restTemplate = new RestTemplate();
         String flaskUrl = "http://127.0.0.1:5000/test-result/calc";  // Flask 서버 주소
@@ -26,6 +26,22 @@ public class PreferenceService {
         ResponseEntity<String> response = restTemplate.postForEntity(flaskUrl, request, String.class);
 
         return response.getBody();
+    }
+
+    public String sendUserVectorToFlaskServer(String userVector) {
+        // RestTemplate 사용해 Flask 서버로 POST 요청
+        RestTemplate restTemplate = new RestTemplate();
+        String flaskUrl = "http://127.0.0.1:5000/login/ai";  // Flask 서버 주소
+
+        //Flask 서버로 보낼 요청 설정
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> request = new HttpEntity<>(userVector, headers);
+
+        ResponseEntity<String> response = restTemplate.postForEntity(flaskUrl, request, String.class);
+
+        return response.getBody();
+
     }
 
     /*@Autowired

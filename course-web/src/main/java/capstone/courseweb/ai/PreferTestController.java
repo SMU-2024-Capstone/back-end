@@ -58,7 +58,7 @@ public class PreferTestController {
 
         System.out.println("플라스크에 전송");
 
-        String flaskResponse = preferenceService.sendToFlaskServer(testResult);
+        String flaskResponse = preferenceService.sendResultToFlaskServer(testResult);
         JSONObject flaskResponseJson = new JSONObject(flaskResponse);
 
         // TODO: user vector 저장하는 코드
@@ -94,6 +94,23 @@ public class PreferTestController {
         finalResponse.put("ai_recommend", places_info);
 
         return ResponseEntity.ok(finalResponse);
+
+    }
+
+    @PostMapping("/login/ai")
+    public ResponseEntity<Map<String, List<Object>>> receiveAiPlaces() {
+        // 토큰 받아오기?
+        // 토큰으로 사용자 찾기
+        // 해당 사용자 유저벡터의 DB에서 꺼내오기
+        String userVector = " ";
+
+        String flaskResponse = preferenceService.sendUserVectorToFlaskServer(userVector);
+        JSONObject flaskResponseJson = new JSONObject(flaskResponse);
+
+
+
+        JSONArray jsonArray = new JSONArray(flaskResponseJson.getJSONArray("placeID"));
+        int[] intArray = new int[jsonArray.length()];
 
     }
 

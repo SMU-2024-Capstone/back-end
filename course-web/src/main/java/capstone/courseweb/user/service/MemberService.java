@@ -19,8 +19,8 @@ public class MemberService implements UserDetailsService {
     private final MemberRepository memberRepository;
 
     @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        return getMemberByEmail(email);
+    public UserDetails loadUserByUsername(String id) throws UsernameNotFoundException {
+        return getMemberById(id);
     }
 
     public Member signUp(SignUpForm form) { //JwtDto
@@ -42,8 +42,8 @@ public class MemberService implements UserDetailsService {
                 .build());
     }
 
-    private Member getMemberByEmail(String email) {
-        return memberRepository.findByEmail(email)
+    private Member getMemberById(String id) {
+        return memberRepository.findById(id)
                 .orElseThrow(() -> new UsernameNotFoundException("일치하는 정보가 없습니다."));
     }
 
