@@ -5,6 +5,7 @@ import capstone.courseweb.jwt.utility.JwtIssuer;
 import capstone.courseweb.user.domain.Member;
 import capstone.courseweb.user.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.http.*;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.*;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 public class PreferTestController {
@@ -42,7 +44,7 @@ public class PreferTestController {
         }
 
         String nickname = authentication.getName(); // 사용자의 id 가져오기 (JwtAuthProvider에서 사용자 ID를 subject로 저장한 경우)
-        System.out.println("jwt 토큰 검증 받은 사용자 id" + nickname);
+        log.info("jwt 토큰 검증 받은 사용자 id: {}",  nickname);
 
         Optional<Member> memberOpt = memberRepository.findByNickname(nickname);
         if (memberOpt.isEmpty()) {
