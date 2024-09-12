@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.http.*;
+import org.springframework.scheduling.support.SimpleTriggerContext;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -100,6 +101,7 @@ public class PreferTestController {
     @PostMapping("/home/ai")
     public ResponseEntity<Map<String, List<Object>>> receiveAiPlaces() {
 
+        /*
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
             Map<String, List<Object>> errorResponse = new HashMap<>();
@@ -109,6 +111,9 @@ public class PreferTestController {
 
         String nickname = authentication.getName(); // 사용자의 id 가져오기 (JwtAuthProvider에서 사용자 ID를 subject로 저장한 경우)
         System.out.println("jwt 토큰 검증 받은 사용자 id" + nickname);
+
+         */
+        String nickname = "현조";
 
         Optional<Member> memberOpt = memberRepository.findByNickname(nickname);
         if (memberOpt.isEmpty()) {
