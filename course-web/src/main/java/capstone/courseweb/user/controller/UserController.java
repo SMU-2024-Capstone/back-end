@@ -55,11 +55,14 @@ public class UserController {
                 if (user.getUser_vector()==null) { //유저벡터 없으면 선호도 테스트 화면으로
                     Map<String, Object> response = new HashMap<>();
                     response.put("status", HttpStatus.OK.value());
+                    response.put("nickname", user.getNickname());
                     response.put("message", "선호도 테스트");
+                    log.info("닉네임 보내기: {}", user.getNickname());
                     return ResponseEntity.ok(response);
                 } else { //유저벡터까지 있으면 회원가입 완료 -> 홈화면
                     Map<String, Object> response = new HashMap<>();
                     response.put("status", HttpStatus.OK.value());
+                    response.put("nickname", user.getNickname());
                     response.put("message", "홈화면");
                     return ResponseEntity.ok(response);
                 }
@@ -116,8 +119,8 @@ public class UserController {
             //닉네임 저장
             Member user = memberOpt.get();
             user.setNickname(nickname);
+            log.info("memberOpt.get().get 작동 확인: {}", memberOpt.get().getName());
             memberRepository.save(user);
-
             log.info("유저 컨트롤러 nickname 출력: {}", nickname);
 
             Map<String, Object> response = new HashMap<>();

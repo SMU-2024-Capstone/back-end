@@ -99,11 +99,26 @@ public class PreferTestController {
 
     @PostMapping("/home/ai")
     public ResponseEntity<Map<String, List<Object>>> receiveAiPlaces() {
-        // TODO: 밑에 내용들 ~ 최종적으로 userVector 변수에 유저벡터 값 넣기
-        // 토큰 받아오기?
-        // 토큰으로 사용자 찾기
-        // 해당 사용자 유저벡터의 DB에서 꺼내오기
-        String userVector = " ";
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            Map<String, List<Object>> errorResponse = new HashMap<>();
+            errorResponse.put("error", Collections.singletonList("Invalid JWT token"));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
+        }
+
+        String nickname = authentication.getName(); // 사용자의 id 가져오기 (JwtAuthProvider에서 사용자 ID를 subject로 저장한 경우)
+        System.out.println("jwt 토큰 검증 받은 사용자 id" + nickname);
+
+        Optional<Member> memberOpt = memberRepository.findByNickname(nickname);
+        if (memberOpt.isEmpty()) {
+            Map<String, List<Object>> errorResponse = new HashMap<>();
+            errorResponse.put("error", Collections.singletonList("User not found"));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
+        }
+
+        Member user = memberOpt.get();
+        String userVector = user.getUser_vector();
 
         String flaskResponse = preferenceService.sendUserVectorToFlaskServer(userVector);
         JSONObject flaskResponseJson = new JSONObject(flaskResponse);
