@@ -52,7 +52,7 @@ public class PreferTestController {
 
         System.out.println("플라스크에 전송");
 
-        String flaskResponse = preferenceService.sendToFlaskServer(testResult);
+        String flaskResponse = preferenceService.sendResultToFlaskServer(testResult);
         JSONObject flaskResponseJson = new JSONObject(flaskResponse);
 
         // TODO: user vector 저장하는 코드
@@ -95,5 +95,49 @@ public class PreferTestController {
         return ResponseEntity.ok(finalResponse);
 
     }
+
+
+    @PostMapping("/home/ai")
+    public ResponseEntity<Map<String, List<Object>>> receiveAiPlaces() {
+        // TODO: 밑에 내용들 ~ 최종적으로 userVector 변수에 유저벡터 값 넣기
+        // 토큰 받아오기?
+        // 토큰으로 사용자 찾기
+        // 해당 사용자 유저벡터의 DB에서 꺼내오기
+        String userVector = " ";
+
+        String flaskResponse = preferenceService.sendUserVectorToFlaskServer(userVector);
+        JSONObject flaskResponseJson = new JSONObject(flaskResponse);
+
+
+        JSONArray jsonArray = new JSONArray(flaskResponseJson.getJSONArray("placeID"));
+        int[] intArray = new int[jsonArray.length()];
+
+        // JSONArray 값들을 int로 변환하여 배열에 저장
+        for (int i = 0; i < jsonArray.length(); i++) {
+            intArray[i] = jsonArray.getInt(i);
+        }
+
+        Map<String, List<Object>> finalResponse = new HashMap<>();
+        List<Object> places_info = new ArrayList<>();
+
+        for (int i = 0; i < intArray.length; i++){
+            Optional<Place> place = placeRepository.findById(intArray[i]);
+
+            if (place.isPresent()) {
+                Map<String, Object> newResponse = new HashMap<>();
+                newResponse.put("placename", place.get().getName());
+                newResponse.put("category", place.get().getCategory());
+                newResponse.put("tag", place.get().getTag());
+                newResponse.put("URL", "https://pcmap.place.naver.com/restaurant/"+place.get().getId());
+                places_info.add(newResponse);
+                System.out.println(newResponse);
+            }
+        }
+        finalResponse.put("ai_recommend", places_info);
+
+        return ResponseEntity.ok(finalResponse);
+
+    }
+
 
 }
