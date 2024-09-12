@@ -65,20 +65,23 @@ public class UserController {
                 } else { //유저벡터까지 있으면 회원가입 완료 -> 홈화면
                         log.info("유저벡터 있음");
                         //프론트 수정 전 return 값
-                    /**JwtDto kakaoJwtToken = jwtIssuer.createToken(kakaoUserForm.getId(), kakaoUserForm.getName());
+
+                    JwtDto kakaoJwtToken = jwtIssuer.createToken(kakaoUserForm.getId(), kakaoUserForm.getName());
                     kakaoUserForm.setRefresh_token(kakaoJwtToken.getRefreshToken());
                     memberRepository.save(user);
 
                     Member member = memberOpt.get();
                     member.setRefresh_token(kakaoJwtToken.getRefreshToken());
                     //log.info("memberOpt.get().get 작동 확인: {}", memberOpt.get().getName());
-                    memberRepository.save(member);**/
+                    memberRepository.save(member);
                     //프론트 수정 전 return 값
                     Map<String, Object> response = new HashMap<>();
                     response.put("status", HttpStatus.OK.value());
                     response.put("nickname", user.getNickname());
                     response.put("message", "홈화면");
-                    //response.put("token", kakaoJwtToken);
+                    response.put("token", kakaoJwtToken);
+
+                    log.info("프론트에 보내는 토큰 확인: {}", kakaoJwtToken.getAccessToken());
                     //log.info("선호도 테스트까지 한 사용자의 액세스 토큰 확인: {}", kakaoJwtToken.getAccessToken());
                     return ResponseEntity.ok(response);
                 }

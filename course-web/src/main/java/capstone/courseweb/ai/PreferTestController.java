@@ -121,7 +121,7 @@ public class PreferTestController {
         //String nickname = "현조";
 
         //jwt 검증 코드 실행할 땐 nickname 대신 id
-        Optional<Member> memberOpt = memberRepository.findByNickname(id);
+        Optional<Member> memberOpt = memberRepository.findById(id);
         if (memberOpt.isEmpty()) {
             Map<String, List<Object>> errorResponse = new HashMap<>();
             errorResponse.put("error", Collections.singletonList("User not found"));
