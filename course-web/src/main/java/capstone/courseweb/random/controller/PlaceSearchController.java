@@ -38,7 +38,7 @@ public class PlaceSearchController {
     public ResponseEntity<Map<String, Object>> searchPlaces(
             @RequestBody SelectedCategory selectedCategory
     ) throws JsonProcessingException { //, @RequestHeader("Authorization")String token
-        
+
 
         log.info("Region: " + selectedCategory.getRegion());
         log.info("Categories: " + selectedCategory.getCategories());
