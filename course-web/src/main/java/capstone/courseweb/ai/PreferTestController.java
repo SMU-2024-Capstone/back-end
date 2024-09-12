@@ -68,7 +68,6 @@ public class PreferTestController {
 
 
 
-
         JSONArray jsonArray = new JSONArray(flaskResponseJson.getJSONArray("placeID"));
         int[] intArray = new int[jsonArray.length()];
 
@@ -103,7 +102,7 @@ public class PreferTestController {
     @PostMapping("/home/ai")
     public ResponseEntity<Map<String, List<Object>>> receiveAiPlaces() {
 
-        /*
+
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
             Map<String, List<Object>> errorResponse = new HashMap<>();
@@ -111,13 +110,18 @@ public class PreferTestController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
         }
 
-        String nickname = authentication.getName(); // 사용자의 id 가져오기 (JwtAuthProvider에서 사용자 ID를 subject로 저장한 경우)
-        System.out.println("jwt 토큰 검증 받은 사용자 id" + nickname);
+        Member member = (Member) authentication.getPrincipal();
+        String id = member.getId();
+        log.info("jwt 토큰 검증 받은 사용자 id: {}", id);
 
-         */
-        String nickname = "현조";
+        String nickname = member.getName();
+        log.info("jwt 토큰 검증 받은 사용자 nickname: {}", nickname);
 
-        Optional<Member> memberOpt = memberRepository.findByNickname(nickname);
+
+        //String nickname = "현조";
+
+        //jwt 검증 코드 실행할 땐 nickname 대신 id
+        Optional<Member> memberOpt = memberRepository.findByNickname(id);
         if (memberOpt.isEmpty()) {
             Map<String, List<Object>> errorResponse = new HashMap<>();
             errorResponse.put("error", Collections.singletonList("User not found"));

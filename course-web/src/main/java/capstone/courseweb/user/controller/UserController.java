@@ -45,14 +45,17 @@ public class UserController {
         Optional<Member> memberOpt = memberRepository.findById(kakaoUserForm.getId());
 
         if (memberOpt.isPresent()) { //db에 회원정보 있을 때
+            log.info("회원정보 있음");
             Member user = memberOpt.get();
             if (user.getNickname()==null) { // 닉네임 없으면 닉네임 화면으로
+                log.info("닉네임 없음");
                 Map<String, Object> response = new HashMap<>();
                 response.put("status", HttpStatus.OK.value());
                 response.put("message", "닉네임 없음");
                 return ResponseEntity.ok(response);
             } else { //닉네임 있으면 유저벡터 있는지 확인
-                if (user.getUser_vector()==null) { //유저벡터 없으면 선호도 테스트 화면으로
+                    if (user.getUser_vector()==null) { //유저벡터 없으면 선호도 테스트 화면으로
+                        log.info("유저벡터없음");
                     Map<String, Object> response = new HashMap<>();
                     response.put("status", HttpStatus.OK.value());
                     response.put("nickname", user.getNickname());
@@ -60,10 +63,23 @@ public class UserController {
                     log.info("닉네임 보내기: {}", user.getNickname());
                     return ResponseEntity.ok(response);
                 } else { //유저벡터까지 있으면 회원가입 완료 -> 홈화면
+                        log.info("유저벡터 있음");
+                        //프론트 수정 전 return 값
+                    /**JwtDto kakaoJwtToken = jwtIssuer.createToken(kakaoUserForm.getId(), kakaoUserForm.getName());
+                    kakaoUserForm.setRefresh_token(kakaoJwtToken.getRefreshToken());
+                    memberRepository.save(user);
+
+                    Member member = memberOpt.get();
+                    member.setRefresh_token(kakaoJwtToken.getRefreshToken());
+                    //log.info("memberOpt.get().get 작동 확인: {}", memberOpt.get().getName());
+                    memberRepository.save(member);**/
+                    //프론트 수정 전 return 값
                     Map<String, Object> response = new HashMap<>();
                     response.put("status", HttpStatus.OK.value());
                     response.put("nickname", user.getNickname());
                     response.put("message", "홈화면");
+                    //response.put("token", kakaoJwtToken);
+                    //log.info("선호도 테스트까지 한 사용자의 액세스 토큰 확인: {}", kakaoJwtToken.getAccessToken());
                     return ResponseEntity.ok(response);
                 }
             }
@@ -73,6 +89,7 @@ public class UserController {
             JwtDto kakaoJwtToken = jwtIssuer.createToken(kakaoUserForm.getId(), kakaoUserForm.getName());
             kakaoUserForm.setRefresh_token(kakaoJwtToken.getRefreshToken());
             memberService.signUp(kakaoUserForm);
+            log.info("회원정보 없음");
 
             /**프론트랑 연결해보려고 return 값 바꿈**/
             Map<String, Object> response = new HashMap<>();
@@ -95,11 +112,12 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
         }
 
-        log.info("authentication.getPrincipal값 확인: {]", authentication.getPrincipal());
+        log.info("authentication.getPrincipal값 확인: {}", authentication.getPrincipal());
 
         //사용자 정보 가져오기
         Member member = (Member) authentication.getPrincipal();
         String id = member.getId();
+        log.info("member.getId()로 아이디 나오는지 확인: {}", id);
         Optional<Member> memberOpt = memberRepository.findById(id);
         if (memberOpt.isEmpty()) {
             Map<String, Object> errorResponse = new HashMap<>();
