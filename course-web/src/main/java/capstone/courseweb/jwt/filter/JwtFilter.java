@@ -7,6 +7,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -15,7 +16,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class JwtFilter extends OncePerRequestFilter { //jwt 토큰 검증
@@ -30,7 +31,7 @@ public class JwtFilter extends OncePerRequestFilter { //jwt 토큰 검증
                                     FilterChain filterChain) throws ServletException, IOException {
 
         String token = resolveTokenFromRequest(request);
-        System.out.println("jwt Filter token1: " + token);
+        log.info("두필터인터널토큰: {}", token);
         //String only_token = token.substring(7);
         //System.out.println("jwt Filter real token: " + token);
 
@@ -39,11 +40,12 @@ public class JwtFilter extends OncePerRequestFilter { //jwt 토큰 검증
             return;
         } else {
             token = token.substring(7);
-            System.out.println("token 7번째부터: " + token);
+            log.info("token 7번째부터: {}", token);
         }
 
         if (jwtAuthProvider.validateToken(token)) {
             Authentication auth = jwtAuthProvider.getAuthentication(token);
+            log.info("auth: {}", auth);
             SecurityContextHolder.getContext().setAuthentication(auth); //사용자 인증정보 설정
         }
         filterChain.doFilter(request, response);

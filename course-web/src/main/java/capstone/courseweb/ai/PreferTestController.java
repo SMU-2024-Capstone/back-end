@@ -2,11 +2,14 @@ package capstone.courseweb.ai;
 
 import capstone.courseweb.jwt.config.JwtAuthProvider;
 import capstone.courseweb.jwt.utility.JwtIssuer;
+import capstone.courseweb.user.domain.Member;
 import capstone.courseweb.user.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.http.*;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -28,11 +31,13 @@ public class PreferTestController {
     @PostMapping("/test-result")
     public ResponseEntity<Map<String, List<Object>>> receiveTestResult(@RequestBody Map<String, Object> testResult) { //, @RequestHeader("Authorization")String token
 
-        /*
+
         //jwt 토큰 검증
        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid JWT token");
+            Map<String, List<Object>> errorResponse = new HashMap<>();
+            errorResponse.put("error", Collections.singletonList("Invalid JWT token"));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
         }
 
         String nickname = authentication.getName(); // 사용자의 id 가져오기 (JwtAuthProvider에서 사용자 ID를 subject로 저장한 경우)
@@ -40,21 +45,10 @@ public class PreferTestController {
 
         Optional<Member> memberOpt = memberRepository.findByNickname(nickname);
         if (memberOpt.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not found");
+            Map<String, List<Object>> errorResponse = new HashMap<>();
+            errorResponse.put("error", Collections.singletonList("User not found"));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
         }
-
-         */
-
-
-        //jwt 토큰 검증
-        /*if (!jwtAuthProvider.validateToken(token.substring(7))) { //Bearer<토큰값>으로 전송되기 때문에 7번째 위치부터(토큰값만 추출)
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid JWT token"); //HTTP 401 Unauthorized 상태 코드를 반환
-        }
-        //사용자 가져오기
-        Claims claims = jwtIssuer.getClaims(token);
-        String id = claims.get("id", String.class);
-        //Member member;
-        Optional<Member> memberOpt = memberRepository.findById(id);*/
 
         System.out.println("플라스크에 전송");
 
@@ -63,6 +57,11 @@ public class PreferTestController {
 
         // TODO: user vector 저장하는 코드
         String userVector = flaskResponseJson.get("user_vector").toString();
+
+        //유저 벡터 저장
+        Member user = memberOpt.get();
+        user.setUser_vector(userVector);
+        memberRepository.save(user);
 
 
 
