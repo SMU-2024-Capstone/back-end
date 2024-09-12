@@ -126,8 +126,13 @@ public class PreferTestController {
 
         Member user = memberOpt.get();
         String userVector = user.getUser_vector();
+        log.info("uservector 확아ㅣㄴ: {}", userVector);
 
-        String flaskResponse = preferenceService.sendUserVectorToFlaskServer(userVector);
+        Map<String, Object> userVectorMap = new HashMap<>();
+        userVectorMap.put("user_vector", userVector);
+
+        String flaskResponse = preferenceService.sendUserVectorToFlaskServer(userVectorMap);
+        log.info("flaskR {}", flaskResponse);
         JSONObject flaskResponseJson = new JSONObject(flaskResponse);
 
 

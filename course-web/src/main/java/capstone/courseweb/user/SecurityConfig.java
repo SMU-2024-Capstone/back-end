@@ -32,6 +32,7 @@ private final JwtFilter jwtFilter;
                         .requestMatchers("/refresh-token").permitAll()
                         .requestMatchers("/h2-console/**").permitAll()  // H2-Console 허용 (중복 허용)
                         .requestMatchers("/error").permitAll()
+                        .requestMatchers("/home/ai").permitAll()
                         .anyRequest().authenticated()
                 )
                 .formLogin(AbstractHttpConfigurer::disable)

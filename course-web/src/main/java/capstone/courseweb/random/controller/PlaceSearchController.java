@@ -40,7 +40,6 @@ public class PlaceSearchController {
     ) throws JsonProcessingException { //, @RequestHeader("Authorization")String token
 
 
-
         log.info("Region: " + selectedCategory.getRegion());
         log.info("Categories: " + selectedCategory.getCategories());
 
