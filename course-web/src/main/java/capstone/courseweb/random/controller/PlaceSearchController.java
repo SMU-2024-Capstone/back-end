@@ -61,7 +61,7 @@ public class PlaceSearchController {
 
         Optional<Member> memberOpt = memberRepository.findByNickname(nickname);
 
-        System.out.println("Optional<Member> memberOpt 닉네임: " + memberOpt.get());
+        System.out.println("Optional<Member> memberOpt 닉네임: " + memberOpt.get().getNickname());
 
         if (memberOpt.isEmpty()) {
             Map<String, Object> errorResponse = new HashMap<>();
