@@ -10,10 +10,5 @@
         <module name="course-web.main" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
-      <module name="course-web" target="17" />
-      <module name="course-web.main" target="17" />
-      <module name="course-web.test" target="17" />
-    </bytecodeTargetLevel>
   </component>
 </project>
