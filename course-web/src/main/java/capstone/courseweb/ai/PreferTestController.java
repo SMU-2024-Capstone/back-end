@@ -100,7 +100,7 @@ public class PreferTestController {
 
 
     @PostMapping("/home/ai")
-    public ResponseEntity<Map<String, List<Object>>> receiveAiPlaces() {
+    public ResponseEntity<Map<String, List<Object>>> receiveAiPlaces() { //선호도 테스트 다시 할 때는 test/result로 받아야 함.
 
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -110,17 +110,17 @@ public class PreferTestController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
         }
 
+
         Member member = (Member) authentication.getPrincipal();
         String id = member.getId();
         log.info("jwt 토큰 검증 받은 사용자 id: {}", id);
 
-        String nickname = member.getName();
+        String nickname = member.getNickname();
         log.info("jwt 토큰 검증 받은 사용자 nickname: {}", nickname);
 
 
         //String nickname = "현조";
 
-        //jwt 검증 코드 실행할 땐 nickname 대신 id
         Optional<Member> memberOpt = memberRepository.findById(id);
         if (memberOpt.isEmpty()) {
             Map<String, List<Object>> errorResponse = new HashMap<>();
@@ -130,7 +130,7 @@ public class PreferTestController {
 
         Member user = memberOpt.get();
         String userVector = user.getUser_vector();
-        log.info("uservector 확아ㅣㄴ: {}", userVector);
+        log.info("uservector 확인: {}", userVector);
 
         Map<String, Object> userVectorMap = new HashMap<>();
         userVectorMap.put("user_vector", userVector);

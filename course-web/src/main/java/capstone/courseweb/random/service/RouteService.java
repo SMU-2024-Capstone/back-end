@@ -32,15 +32,21 @@ public class RouteService {
     public List<RouteDto> findRoutesBetweenPlaces(List<PlaceDto> places) {
         List<RouteDto> routes = new ArrayList<>(); // 장소 사이의 경로들 JSON
 
+        log.info("받아온 places 값: {}", places);
+        log.info("받아온 places 값: {}", places.get(0));
+
         for (int i = 0; i < places.size() - 1; i++) {
             PlaceDto from = places.get(i);
             PlaceDto to = places.get(i+1);
 
 
 
+
             String response = getRoute(from.getX(), from.getY(), to.getX(), to.getY());
             RouteDto route = parseRouteResponse(response, from, to);
             routes.add(route);
+            log.info("리턴 값 확인 distance: {}", route.getDistance());
+            log.info("리턴 값 확인 distance: {}", route.getRouteDescription());
         }
 
         return routes;
@@ -164,16 +170,23 @@ public class RouteService {
             JSONObject subPath = subPathArray.getJSONObject(i);
             int trafficType = subPath.getInt("trafficType");
 
+
             //교통 수단과 시간
             if (trafficType == 1) {
                 routeDescription.append("지하철 ").append(subPath.getInt("sectionTime")).append("분").append("<br>");
             } else if (trafficType == 2) {
                 routeDescription.append("버스 ").append(subPath.getInt("sectionTime")).append("분").append("<br>");
             } else {
-                routeDescription.append("도보 ").append(subPath.getInt("sectionTime")).append("분").append("<br>");
+                if(trafficType == 0) {
+                    log.info("도보 0분 있는지 확인:{}", subPath.getInt("sectionTime"));
+                }
+                if (subPath.getInt("sectionTime") != 0) {
+                    routeDescription.append("도보 ").append(subPath.getInt("sectionTime")).append("분").append("<br>");
+                }
             }
         }
 
+        log.info("경로 확인: {}", routeDescription);
         return RouteDto.builder()
                 //.startPlace(from.getPlaceName())
                 //.sx(from.getX())
