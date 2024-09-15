@@ -77,9 +77,10 @@ public class JwtIssuer {
     }
 
     public Claims getClaims(String token) {
-        log.info("getclaim 실행, token 출력: {}", token);
+        log.info("getclaim 실행, token 출력: {}", token); /**여기까진 됨**/
         Claims claims;
         try {
+            log.info("겟클레임 트라이 실행되는지 확인");
             claims = Jwts.parser()
                     .setSigningKey(SECRET_KEY)
                     //.build
@@ -88,11 +89,16 @@ public class JwtIssuer {
             log.info("claim 복호화 확인: {}", claims.get("id"));
 
         }catch (ExpiredJwtException e) {
+            log.info("겟클레임에서 ExpiredJwtException 오류");
             claims = e.getClaims();
         }catch (Exception e) {
             //System.out.println("getclaim " + claims);
             throw new BadCredentialsException("유효한 토큰이 아닙니다.");
         }
+
+        log.info("겟클레임에서 리턴되는 클레임 출력: {}" , claims);
+        log.info("겟클레임에서 리턴되는 클레임의 아이디 출력: {}" , claims.get("id"));
+        log.info("겟클레임에서 리턴되는 클레임 출력: {}" , claims.toString());
         return claims;
     }
 }

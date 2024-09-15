@@ -80,6 +80,9 @@ public class PlaceSearchController {
 
         }
 
+        log.info("placeList 확인: {}", placeList);
+        log.info("placeList 확인 0번째: {}", placeList.get(0));
+
         List<RouteDto> routes = routeService.findRoutesBetweenPlaces(placeList);
 
         List<List<String>> placeInfo = new ArrayList<>();
@@ -107,13 +110,18 @@ public class PlaceSearchController {
         response.put("route", routes);
         response.put("info", placeInfo);
 
-        System.out.println("플레이스 서치 response: " + response);
+        System.out.println("placeSerchController파일 플레이스 서치 response: " + response);
 
         //데이터 수정 예시.
         //Member member = memberOpt.get(); // Member 객체 가져오기
         //member.setName("현조");
         //memberRepository.save(member);
 
+        log.info("리턴값 확인: {}", response);
+        log.info("리턴값 확인 .route: {}", response.get("route"));
+        log.info("리턴값 확인 .route toString: {}", response.get("route").toString());
+        log.info("리턴값 확인 .info: {}", response.get("info"));
+        log.info("리턴값 확인 .info toString: {}", response.get("info").toString());
 
         return ResponseEntity.ok(response);
         //return ResponseEntity.ok(routes);

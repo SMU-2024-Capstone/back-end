@@ -47,7 +47,7 @@ public class MemberService implements UserDetailsService {
 
 
     private Member getMemberById(String id) {
-        log.info("겟멤버바이아이디 id 출력: {]", id);
+        log.info("겟멤버바이아이디 id 출력: {}", id);
         return memberRepository.findById(id)
                 .orElseThrow(() -> new UsernameNotFoundException("일치하는 정보가 없습니다."));
     }
