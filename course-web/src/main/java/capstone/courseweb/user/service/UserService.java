@@ -1,5 +1,7 @@
 package capstone.courseweb.user.service;
 
+import capstone.courseweb.jwt.JwtDto;
+import capstone.courseweb.jwt.utility.JwtIssuer;
 import capstone.courseweb.user.domain.Member;
 import capstone.courseweb.user.domain.SignUpForm;
 import capstone.courseweb.user.repository.MemberRepository;
@@ -9,15 +11,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * 인가코드로 access token 발급
@@ -31,6 +34,76 @@ public class UserService {
 
     @Value("${kakao.api-key}")
     private String CLIENT_ID;
+    private SignUpForm kakaoUserForm;
+    private final MemberRepository memberRepository;
+    private final JwtIssuer jwtIssuer;
+    private final MemberService memberService;
+
+    public Map<String, Object> handleKakaoLogin(String code) throws JsonProcessingException {
+
+        kakaoUserForm = getUserInfo(code);
+        log.info("Email: {}, ID: {}, Name: {}, Provider: {}", kakaoUserForm.getEmail(), kakaoUserForm.getId(), kakaoUserForm.getName());
+        Optional<Member> memberOpt = memberRepository.findById(kakaoUserForm.getId());
+
+        if (memberOpt.isPresent()) { //db에 회원정보 있을 때
+            log.info("회원정보 있음");
+            Member user = memberOpt.get();
+            if (user.getNickname()==null) { // 닉네임 없으면 닉네임 화면으로
+                log.info("닉네임 없음");
+                Map<String, Object> response = new HashMap<>();
+                response.put("status", HttpStatus.OK.value());
+                response.put("message", "닉네임 없음");
+                return response;
+            } else { //닉네임 있으면 유저벡터 있는지 확인
+                if (user.getUser_vector()==null) { //유저벡터 없으면 선호도 테스트 화면으로
+                    log.info("유저벡터없음");
+                    Map<String, Object> response = new HashMap<>();
+                    response.put("status", HttpStatus.OK.value());
+                    response.put("nickname", user.getNickname());
+                    response.put("message", "선호도 테스트");
+                    log.info("닉네임 보내기: {}", user.getNickname());
+                    return response;
+                } else { //유저벡터까지 있으면 회원가입 완료 -> 홈화면
+                    log.info("유저벡터 있음");
+                    //프론트 수정 전 return 값
+
+                    JwtDto kakaoJwtToken = jwtIssuer.createToken(kakaoUserForm.getId(), kakaoUserForm.getName());
+                    kakaoUserForm.setRefresh_token(kakaoJwtToken.getRefreshToken());
+                    memberRepository.save(user);
+
+                    Member member = memberOpt.get();
+                    member.setRefresh_token(kakaoJwtToken.getRefreshToken());
+                    //log.info("memberOpt.get().get 작동 확인: {}", memberOpt.get().getName());
+                    memberRepository.save(member);
+                    //프론트 수정 전 return 값
+                    Map<String, Object> response = new HashMap<>();
+                    response.put("status", HttpStatus.OK.value());
+                    response.put("nickname", user.getNickname());
+                    response.put("message", "홈화면");
+                    response.put("token", kakaoJwtToken);
+
+                    log.info("프론트에 보내는 토큰 확인: {}", kakaoJwtToken.getAccessToken());
+                    //log.info("선호도 테스트까지 한 사용자의 액세스 토큰 확인: {}", kakaoJwtToken.getAccessToken());
+                    return response;
+                }
+            }
+
+        }
+        else { //db에 회원정보 없을 때
+            JwtDto kakaoJwtToken = jwtIssuer.createToken(kakaoUserForm.getId(), kakaoUserForm.getName());
+            kakaoUserForm.setRefresh_token(kakaoJwtToken.getRefreshToken());
+            memberService.signUp(kakaoUserForm);
+            log.info("회원정보 없음");
+
+            /**프론트랑 연결해보려고 return 값 바꿈**/
+            Map<String, Object> response = new HashMap<>();
+            response.put("status", HttpStatus.CREATED.value());
+            response.put("token", kakaoJwtToken);
+            return response;
+            //return ResponseEntity.ok(kakaoJwtToken);
+        }
+
+    }
 
     public SignUpForm getUserInfo(String code) throws JsonProcessingException{
 

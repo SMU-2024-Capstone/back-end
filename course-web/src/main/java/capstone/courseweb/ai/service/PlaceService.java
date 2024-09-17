@@ -2,8 +2,10 @@ package capstone.courseweb.ai.service;
 
 import capstone.courseweb.ai.*;
 //import capstone.courseweb.rating.RatingService;
-import capstone.courseweb.ai.rating.Rating;
-import capstone.courseweb.ai.rating.RatingRepository;
+//import capstone.courseweb.ai.rating.Rating;
+//import capstone.courseweb.ai.rating.RatingRepository;
+import capstone.courseweb.rating.Rating;
+import capstone.courseweb.rating.RatingRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -29,6 +31,8 @@ public class PlaceService {
 
         List<Place> places;// = placeRepository.findByCategory(category, pageable);
 
+        log.info("전달된 카테고리 출력: {}", category);
+        log.info("계산한 pageable 출력: {}", pageable);
         if ("전체".equals(category)) {
             // 카테고리가 "전체"일 때 모든 장소 조회
             places = placeRepository.findAll(pageable).getContent();
@@ -36,6 +40,8 @@ public class PlaceService {
             // 카테고리가 특정 값일 때 해당 카테고리의 장소 조회
             places = placeRepository.findByCategory(category, pageable);
         }
+
+        log.info("db에서 가져온 places 리스트 출력: {}", places.get(0));
 
         return places.stream()
                 .map(place -> {
@@ -46,8 +52,11 @@ public class PlaceService {
     }
 
     public int getRatingForPlace(int placeId, String userId) {
+
+        log.info("getRatingForPlace에서 받은 placeId 출력 출력: {}", placeId);
+        log.info("getRatingForPlace에서 받은 userId 출력 출력: {}", userId);
         // 특정 장소에 대한 평점 조회
-        Optional<Rating> optionalRating = ratingRepository.findByPlaceidAndUserid(placeId, userId);
+        Optional<Rating> optionalRating = ratingRepository.findByPlaceIDAndUserID(placeId, userId);
 
         // 평점이 없으면 0 반환
         return optionalRating.map(Rating::getRating).orElse(0);

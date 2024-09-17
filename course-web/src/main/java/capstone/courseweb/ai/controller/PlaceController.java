@@ -2,6 +2,7 @@ package capstone.courseweb.ai.controller;
 
 import capstone.courseweb.ai.PlaceResponse;
 import capstone.courseweb.ai.service.PlaceService;
+import capstone.courseweb.jwt.service.AuthService;
 import capstone.courseweb.user.domain.Member;
 import capstone.courseweb.user.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +25,7 @@ public class PlaceController {
 
     private final PlaceService placeService;
     private final MemberRepository memberRepository;
+    private final AuthService authService;
 
     @GetMapping("/places")
     public ResponseEntity<?> getPlaces( //List<PlaceResponse>
@@ -32,20 +34,23 @@ public class PlaceController {
 
         log.info("/places에 요청 들어옴");
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        /*Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
             Map<String, List<Object>> errorResponse = new HashMap<>();
             errorResponse.put("error", Collections.singletonList("Invalid JWT token"));
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
-        }
+        }*/
+        Member member = authService.getAuthenticatedMember();
+
+        //log.info("authentication.getPrincipal값 확인: {}", authentication.getPrincipal());
 
         /**닉네임에서는 이렇게하고 **/
-        Member member = (Member) authentication.getPrincipal();
+        //Member member = (Member) authentication.getPrincipal();
         String id = member.getId();
         log.info("닉네임 방식으로 했을 때 id: {}", id);
 
         /**프리퍼런스에서는 이렇게 함.. 둘다되긴하는듯?? **/
-        String nickname = authentication.getName(); // 사용자의 id 가져오기 (JwtAuthProvider에서 사용자 ID를 subject로 저장한 경우)
+        String nickname = member.getNickname(); // 사용자의 id 가져오기 (JwtAuthProvider에서 사용자 ID를 subject로 저장한 경우)
         log.info("프리프런스 방식으로 했을 때 nickname: {}",  nickname);
 
         //저장할 거 아니면 안써도 될 듯
@@ -57,6 +62,9 @@ public class PlaceController {
         }*/
 
 
+        log.info("입력한 카테고리 출력: {}", category);
+        log.info("입력한 페이지 넘버 출력: {}", pageNumber);
+        log.info("아이디 출력: {}", id);
         List<PlaceResponse> places = placeService.getPlacesByCategoryAndPage(category, pageNumber, id);
         log.info("places: {}", places.get(0));
         return ResponseEntity.ok(places);
