@@ -33,6 +33,8 @@ private final JwtFilter jwtFilter;
                         .requestMatchers("/h2-console/**").permitAll()  // H2-Console 허용 (중복 허용)
                         .requestMatchers("/error").permitAll()
                         .requestMatchers("/home/ai").permitAll()
+                        .requestMatchers("/places").permitAll()
+                        .requestMatchers("/rating").permitAll()
                         .anyRequest().authenticated()
                 )
                 .formLogin(AbstractHttpConfigurer::disable)

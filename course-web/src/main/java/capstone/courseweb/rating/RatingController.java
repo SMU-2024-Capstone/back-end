@@ -73,7 +73,7 @@ public class RatingController {
         Integer placeID = placeRepository.findByName(placename).get().getId();
         String ratingID = userID + '-' + placeID.toString();
         // 만약 이미 별점을 매긴 장소의 별점을 수정한 경우일 때
-        if(ratingRepository.findById(ratingID).isPresent()){
+        if(ratingRepository.findByRatingID(ratingID).isPresent()){
 
         }
         // 아닐 경우
