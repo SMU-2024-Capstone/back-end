@@ -21,24 +21,20 @@ import java.util.stream.Collectors;
 public class PlaceService {
 
     private final PlaceRepository placeRepository;
-    //private final RatingService ratingService;
     private final RatingRepository ratingRepository;
 
 
-    public List<PlaceResponse> getPlacesByCategoryAndPage(String category, int pageNumber, String userid) {
-        int pageSize = 20;
-        Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
+    public List<PlaceResponse> getPlacesByCategoryAndPage(String category, String userid) {
 
-        List<Place> places;// = placeRepository.findByCategory(category, pageable);
-
+        List<Place> places;
         log.info("전달된 카테고리 출력: {}", category);
-        log.info("계산한 pageable 출력: {}", pageable);
+
         if ("전체".equals(category)) {
             // 카테고리가 "전체"일 때 모든 장소 조회
-            places = placeRepository.findAll(pageable).getContent();
+            places = placeRepository.findAll();
         } else {
             // 카테고리가 특정 값일 때 해당 카테고리의 장소 조회
-            places = placeRepository.findByCategory(category, pageable);
+            places = placeRepository.findByCategory(category);
         }
 
         log.info("db에서 가져온 places 리스트 출력: {}", places.get(0));

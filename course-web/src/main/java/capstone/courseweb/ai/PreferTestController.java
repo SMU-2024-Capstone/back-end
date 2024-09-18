@@ -2,6 +2,7 @@ package capstone.courseweb.ai;
 
 import capstone.courseweb.ai.service.PlaceService;
 import capstone.courseweb.jwt.config.JwtAuthProvider;
+import capstone.courseweb.jwt.service.AuthService;
 import capstone.courseweb.jwt.utility.JwtIssuer;
 import capstone.courseweb.rating.RatingRepository;
 import capstone.courseweb.user.domain.Member;
@@ -33,31 +34,12 @@ public class PreferTestController {
     private final PlaceRepository placeRepository;
     private final PlaceService placeService;
     private final RatingRepository ratingRepository;
+    private final AuthService authService;
 
     @PostMapping("/test-result")
-    public ResponseEntity<Map<String, List<Object>>> receiveTestResult(@RequestBody Map<String, Object> testResult) { //, @RequestHeader("Authorization")String token
-        //jwt 토큰 검증
-       Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || !authentication.isAuthenticated()) {
-            Map<String, List<Object>> errorResponse = new HashMap<>();
-            errorResponse.put("error", Collections.singletonList("Invalid JWT token"));
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
-        }
+    public ResponseEntity<Map<String, List<Object>>> receiveTestResult(@RequestBody Map<String, Object> testResult) {
 
-        String nickname = authentication.getName(); // 사용자의 id 가져오기 (JwtAuthProvider에서 사용자 ID를 subject로 저장한 경우)
-        log.info("jwt 토큰 검증 받은 사용자 id: {}",  nickname);
-
-        // String nickname = "현조"; // test 완료
-        Optional<Member> memberOpt = memberRepository.findByNickname(nickname);
-        if (memberOpt.isEmpty()) {
-            Map<String, List<Object>> errorResponse = new HashMap<>();
-            errorResponse.put("error", Collections.singletonList("User not found"));
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
-        }
-
-        Member user = memberOpt.get();
-
-        System.out.println("플라스크에 전송");
+        Member user = authService.getAuthenticatedMember();
 
         String userVector = "0";
         // 사용자가 기존에 저장한 별점이 있다면 -> 기존 userVector를 전달해줌
@@ -117,33 +99,13 @@ public class PreferTestController {
     @PostMapping("/home/ai")
     public ResponseEntity<Map<String, List<Object>>> sendAiPlaces() { //선호도 테스트 다시 할 때는 test/result로 받아야 함.
 
-
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || !authentication.isAuthenticated()) {
-            Map<String, List<Object>> errorResponse = new HashMap<>();
-            errorResponse.put("error", Collections.singletonList("Invalid JWT token"));
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
-        }
-
-
-        Member member = (Member) authentication.getPrincipal();
-        String id = member.getId();
+        Member user = authService.getAuthenticatedMember();
+        String id = user.getId();
         log.info("jwt 토큰 검증 받은 사용자 id: {}", id);
 
-        String nickname = member.getNickname();
+        String nickname = user.getNickname();
         log.info("jwt 토큰 검증 받은 사용자 nickname: {}", nickname);
 
-
-        // String id = "현조";  // test 완료
-
-        Optional<Member> memberOpt = memberRepository.findById(id);
-        if (memberOpt.isEmpty()) {
-            Map<String, List<Object>> errorResponse = new HashMap<>();
-            errorResponse.put("error", Collections.singletonList("User not found"));
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
-        }
-
-        Member user = memberOpt.get();
         String userVector = user.getUser_vector();
         log.info("uservector 확인: {}", userVector);
 
