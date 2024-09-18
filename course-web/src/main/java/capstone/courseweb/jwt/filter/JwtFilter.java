@@ -32,15 +32,10 @@ public class JwtFilter extends OncePerRequestFilter { //jwt 토큰 검증
 
         String token = resolveTokenFromRequest(request);
         log.info("두필터인터널토큰: {}", token);
-        //String only_token = token.substring(7);
-        //System.out.println("jwt Filter real token: " + token);
 
         if (!StringUtils.hasText(token)) {
             filterChain.doFilter(request, response);
             return;
-        } else {
-            token = token.substring(7);
-            log.info("token 7번째부터: {}", token);
         }
 
         if (jwtAuthProvider.validateToken(token)) {
@@ -55,7 +50,7 @@ public class JwtFilter extends OncePerRequestFilter { //jwt 토큰 검증
         String token = request.getHeader(JWT_HEADER_KEY);
 
         if (!ObjectUtils.isEmpty(token)) {
-            return token;
+            return token.substring(7);
         }
 
         return null;

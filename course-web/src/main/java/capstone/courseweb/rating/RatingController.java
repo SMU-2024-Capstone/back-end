@@ -2,6 +2,7 @@ package capstone.courseweb.rating;
 
 import capstone.courseweb.ai.Place;
 import capstone.courseweb.ai.PlaceRepository;
+import capstone.courseweb.jwt.service.AuthService;
 import capstone.courseweb.user.domain.Member;
 import capstone.courseweb.user.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -27,17 +28,12 @@ public class RatingController {
     private final PlaceRepository placeRepository;
     private final RatingRepository ratingRepository;
     private final RatingService ratingService;
+    private final AuthService authService;
 
     @PostMapping("/rating")
     public ResponseEntity<Map<String, List<Object>>> receiveRating(@RequestBody Map<String, Object> ratingMap) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || !authentication.isAuthenticated()) {
-            Map<String, List<Object>> errorResponse = new HashMap<>();
-            errorResponse.put("error", Collections.singletonList("Invalid JWT token"));
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
-        }
 
-        Member member = (Member) authentication.getPrincipal();
+        Member member = authService.getAuthenticatedMember();
         String userID = member.getId();
         log.info("jwt 토큰 검증 받은 사용자 id: {}", userID);
 

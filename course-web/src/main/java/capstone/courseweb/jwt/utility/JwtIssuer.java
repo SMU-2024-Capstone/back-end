@@ -43,8 +43,6 @@ public class JwtIssuer {
         Claims claims = Jwts.claims().setSubject(encryptedId); //claim: jwt에 포함될 정보
         claims.put("id", userId);
         claims.put("name", userName);
-        //claims.put("nickname", nickname);
-        //claims.put(KEY_ROLES, role);
 
         Date now = new Date();
 

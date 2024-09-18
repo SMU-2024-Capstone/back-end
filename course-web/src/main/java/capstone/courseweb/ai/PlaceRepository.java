@@ -10,7 +10,6 @@ import java.util.Optional;
 public interface PlaceRepository extends JpaRepository<Place, Integer> { // ID 타입을 Integer로 수정
     Optional<Place> findById(Integer id);
     Optional<Place> findByName(String name);
-
-    List<Place> findByCategory(@Param("category") String category, Pageable pageable);
+    List<Place> findByCategory(@Param("category") String category);
 
 }

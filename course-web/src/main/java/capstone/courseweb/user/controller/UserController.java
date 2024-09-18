@@ -28,8 +28,8 @@ import java.util.Optional;
 @RestController
 public class UserController {
 
-    @Autowired
-    UserService userService;
+
+    private final UserService userService;
     private final NicknameService nicknameService;
     private final AuthService authService;
 
