@@ -1,5 +1,6 @@
 package capstone.courseweb.ai;
 
+import capstone.courseweb.ai.service.PlaceService;
 import capstone.courseweb.jwt.config.JwtAuthProvider;
 import capstone.courseweb.jwt.utility.JwtIssuer;
 import capstone.courseweb.user.domain.Member;
@@ -9,7 +10,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.http.*;
-import org.springframework.scheduling.support.SimpleTriggerContext;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -30,11 +30,10 @@ public class PreferTestController {
     private final PreferenceService preferenceService;
     private final MemberRepository memberRepository;
     private final PlaceRepository placeRepository;
+    private final PlaceService placeService;
 
     @PostMapping("/test-result")
     public ResponseEntity<Map<String, List<Object>>> receiveTestResult(@RequestBody Map<String, Object> testResult) { //, @RequestHeader("Authorization")String token
-
-
         //jwt 토큰 검증
        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
@@ -58,7 +57,6 @@ public class PreferTestController {
         String flaskResponse = preferenceService.sendResultToFlaskServer(testResult);
         JSONObject flaskResponseJson = new JSONObject(flaskResponse);
 
-        // TODO: user vector 저장하는 코드
         String userVector = flaskResponseJson.get("user_vector").toString();
 
         //유저 벡터 저장
@@ -119,7 +117,7 @@ public class PreferTestController {
         log.info("jwt 토큰 검증 받은 사용자 nickname: {}", nickname);
 
 
-        //String nickname = "현조";
+        // String id = "현조";  // test 완료
 
         Optional<Member> memberOpt = memberRepository.findById(id);
         if (memberOpt.isEmpty()) {
@@ -155,11 +153,13 @@ public class PreferTestController {
             Optional<Place> place = placeRepository.findById(intArray[i]);
 
             if (place.isPresent()) {
+                int rating = placeService.getRatingForPlace(place.get().getId(), id);
                 Map<String, Object> newResponse = new HashMap<>();
                 newResponse.put("placename", place.get().getName());
                 newResponse.put("category", place.get().getCategory());
                 newResponse.put("tag", place.get().getTag());
                 newResponse.put("URL", "https://pcmap.place.naver.com/restaurant/"+place.get().getId());
+                newResponse.put("rating", rating);
                 places_info.add(newResponse);
                 System.out.println(newResponse);
             }
@@ -169,6 +169,5 @@ public class PreferTestController {
         return ResponseEntity.ok(finalResponse);
 
     }
-
 
 }
