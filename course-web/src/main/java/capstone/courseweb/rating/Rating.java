@@ -14,7 +14,6 @@ import lombok.*;
 @ToString
 public class Rating {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private String ratingID;    // userID+placeID
     private Integer placeID;
     private String userID;

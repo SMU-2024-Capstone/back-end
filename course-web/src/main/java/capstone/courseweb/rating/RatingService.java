@@ -4,22 +4,13 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Map;
 
+@Service
 public class RatingService {
-    /*
-{
-    "user_vector": " ",
-    "total_rating": 20,   // 여지껏 매긴 별점 합
-    "count_rating_places": 6,  // 여지껏 별점 매긴 장소 수
-
-    "placeID": 1336760258,  // 현재 별점 매긴 장소
-    "rating": 5  // 현재 매긴 별점
- }
-     */
-
     public String sendRatingToFlaskServer(Map<String, Object> ratingRequest) {
         // RestTemplate 사용해 Flask 서버로 POST 요청
         RestTemplate restTemplate = new RestTemplate();
