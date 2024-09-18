@@ -3,6 +3,7 @@ package capstone.courseweb.ai;
 import capstone.courseweb.ai.service.PlaceService;
 import capstone.courseweb.jwt.config.JwtAuthProvider;
 import capstone.courseweb.jwt.utility.JwtIssuer;
+import capstone.courseweb.rating.RatingRepository;
 import capstone.courseweb.user.domain.Member;
 import capstone.courseweb.user.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -31,10 +32,10 @@ public class PreferTestController {
     private final MemberRepository memberRepository;
     private final PlaceRepository placeRepository;
     private final PlaceService placeService;
+    private final RatingRepository ratingRepository;
 
     @PostMapping("/test-result")
     public ResponseEntity<Map<String, List<Object>>> receiveTestResult(@RequestBody Map<String, Object> testResult) { //, @RequestHeader("Authorization")String token
-
         //jwt 토큰 검증
        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
@@ -46,7 +47,6 @@ public class PreferTestController {
         String nickname = authentication.getName(); // 사용자의 id 가져오기 (JwtAuthProvider에서 사용자 ID를 subject로 저장한 경우)
         log.info("jwt 토큰 검증 받은 사용자 id: {}",  nickname);
 
-
         // String nickname = "현조"; // test 완료
         Optional<Member> memberOpt = memberRepository.findByNickname(nickname);
         if (memberOpt.isEmpty()) {
@@ -55,16 +55,27 @@ public class PreferTestController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
         }
 
+        Member user = memberOpt.get();
+
         System.out.println("플라스크에 전송");
 
+        String userVector = "0";
+        // 사용자가 기존에 저장한 별점이 있다면 -> 기존 userVector를 전달해줌
+        if (ratingRepository.findByUserID(user.getId()).isPresent() && ratingRepository.findByUserID(user.getId()).get().size()>0){
+            log.info("저장한 별점이 있음: {}", ratingRepository.findByUserID(user.getId()).get());
+            ratingRepository.findByUserID(user.getId()).get();
+            userVector = user.getUser_vector();
+        }
+        log.info("user_vector: {}", userVector);
+        testResult.put("user_vector", userVector);
         String flaskResponse = preferenceService.sendResultToFlaskServer(testResult);
         JSONObject flaskResponseJson = new JSONObject(flaskResponse);
 
-        String userVector = flaskResponseJson.get("user_vector").toString();
+        String updatedUserVector = flaskResponseJson.get("user_vector").toString();
 
         //유저 벡터 저장
-        Member user = memberOpt.get();
-        user.setUser_vector(userVector);
+
+        user.setUser_vector(updatedUserVector);
         memberRepository.save(user);
 
 
