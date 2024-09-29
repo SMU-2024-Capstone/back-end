@@ -3,8 +3,6 @@ package capstone.courseweb.jwt.controller;
 import capstone.courseweb.jwt.JwtDto;
 import capstone.courseweb.jwt.config.JwtAuthProvider;
 import capstone.courseweb.jwt.utility.JwtIssuer;
-import capstone.courseweb.user.domain.SignUpForm;
-import capstone.courseweb.user.repository.MemberRepository;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -24,7 +22,6 @@ public class RefreshTokenController {
 
     @PostMapping("/access-token-recreate")
     public ResponseEntity<JwtDto> refreshToken(@RequestBody JwtDto jwtDto) {
-        //JWT Dto로 accesstoken과 refreshtoken 검증
         if (!jwtAuthProvider.validateToken(jwtDto)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
@@ -33,35 +30,22 @@ public class RefreshTokenController {
         Claims refreshClaims = jwtIssuer.getClaims(jwtDto.getRefreshToken());
         Date refreshExpirationDate = refreshClaims.getExpiration();
         if (refreshExpirationDate.before(new Date())) {
-            // 리프레시 토큰이 만료된 경우 401 Unauthorized를 반환
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
 
 
 
         Claims accessClaims = jwtIssuer.getClaims(jwtDto.getAccessToken());
-        //String userId = accessClaims.get("id", String.class);
-        //둘 다 유효하면 새 토큰 생성
         String newAccessToken = String.valueOf(jwtIssuer.createToken(
                 accessClaims.get("id", String.class),
                 accessClaims.get("name", String.class)
-                //accessClaims.get("nickname", String.class)
         ));
 
         JwtDto newTokens = JwtDto.builder()
                 .accessToken(newAccessToken)
-                .refreshToken(jwtDto.getRefreshToken()) // 기존의 RefreshToken을 그대로 사용
+                .refreshToken(jwtDto.getRefreshToken())
                 .build();
 
-        //리프레시토큰을 새로 발급하는 경우에 하면 됨.
-        /*Optional<Member> memberOpt = memberRepository.findById(userId);
-        if (memberOpt.isPresent()) {
-            Member member = memberOpt.get();
-            member.setRefresh_token(newTokens.getRefreshToken());
-            memberRepository.save(member);
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
-        }*/
 
         return ResponseEntity.ok(newTokens);
     }

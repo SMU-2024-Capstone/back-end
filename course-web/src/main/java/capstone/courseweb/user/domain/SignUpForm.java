@@ -14,6 +14,5 @@ public class SignUpForm {
     private String Id;
     private String name; //카카오에서 받아오는 닉네임
     private String nickname;  //이길로에서 정하는 닉네임
-    //private Member.MemberProvider provider;
     private String refresh_token;
 }

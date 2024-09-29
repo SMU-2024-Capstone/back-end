@@ -22,29 +22,16 @@ import java.util.Collections;
 public class Member implements UserDetails {
     @Id
     @Column(nullable = false, unique = true)
-    //@GeneratedValue(strategy = GenerationType.IDENTITY)
     private String Id; //소셜id
-
     private String email;
-
-    private String password; //UserDetails에 있어서 넣어야됨. 값은 null로 저장
-
+    private String password;
     private String name;
     private String nickname;
-
-    /*@Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private MemberRole memberRole;*/
-
-    /*@Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private MemberProvider provider;*/
 
 
     @Override
     @JsonIgnore
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        log.info("getAuthorities 에서 id 출력: {}", this.getId());
         return Collections.singleton(new SimpleGrantedAuthority(this.getId()));
     }
 
@@ -65,7 +52,7 @@ public class Member implements UserDetails {
     @JsonIgnore
     public boolean isAccountNonExpired() {
         return true;
-    } //계쩡 만료 여부
+    }
 
     @Override
     @JsonIgnore
@@ -84,24 +71,6 @@ public class Member implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
-
-    /*@Getter
-    @RequiredArgsConstructor
-    public enum MemberRole {
-        GUEST,
-        USER;
-        private static final String PREFIX = "ROLE_" ;
-        public String getAuthority() {
-            return PREFIX + this.name();
-        }
-    }*/
-
-    /*public enum  MemberProvider {
-        LOCAL,
-        KAKAO,
-        NAVER,
-        GOOGLE
-    }*/
 
     private String refresh_token;
 
