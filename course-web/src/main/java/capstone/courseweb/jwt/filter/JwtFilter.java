@@ -19,19 +19,16 @@ import java.io.IOException;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class JwtFilter extends OncePerRequestFilter { //jwt 토큰 검증
+public class JwtFilter extends OncePerRequestFilter {
 
     private final JwtAuthProvider jwtAuthProvider;
     public static final String JWT_HEADER_KEY = "Authorization";
-
-
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
 
         String token = resolveTokenFromRequest(request);
-        log.info("두필터인터널토큰: {}", token);
 
         if (!StringUtils.hasText(token)) {
             filterChain.doFilter(request, response);
@@ -40,13 +37,12 @@ public class JwtFilter extends OncePerRequestFilter { //jwt 토큰 검증
 
         if (jwtAuthProvider.validateToken(token)) {
             Authentication auth = jwtAuthProvider.getAuthentication(token);
-            log.info("auth: {}", auth);
-            SecurityContextHolder.getContext().setAuthentication(auth); //사용자 인증정보 설정
+            SecurityContextHolder.getContext().setAuthentication(auth);
         }
         filterChain.doFilter(request, response);
     }
 
-    private String resolveTokenFromRequest(HttpServletRequest request) { //http요청에서 Authorization 헤더에 있는 jwt 토큰 추출.
+    private String resolveTokenFromRequest(HttpServletRequest request) {
         String token = request.getHeader(JWT_HEADER_KEY);
 
         if (!ObjectUtils.isEmpty(token)) {

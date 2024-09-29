@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Map;
-import java.util.Objects;
 
 @Service
 public class PreferenceService {
@@ -43,38 +42,4 @@ public class PreferenceService {
         return response.getBody();
 
     }
-
-
-
-
-    /*@Autowired
-    private PreferenceRepository preferenceRepository;
-
-    @Autowired
-    private MemberRepository memberRepository;
-
-    public void savePreferences(PreferenceDto preferenceDto, String userId) {
-        //userid로 객체 찾기
-        Optional<Member> memberOpt = memberRepository.findById(userId);
-
-        if(memberOpt.isPresent()) {
-            Member member = memberOpt.get();
-
-            PreferenceEntity preferenceEntity = new PreferenceEntity();
-            preferenceEntity.setUser(member);
-
-            //preferenceEntity.setAtmosphereCategory1(preferenceDto.getAtmosphereCategory1());
-            //preferenceEntity.setAtmosphereCategory2(preferenceDto.getAtmosphereCategory2());
-            //preferenceEntity.setAtmosphereCategory3(preferenceDto.getAtmosphereCategory3());
-            preferenceEntity.setImportanceCategory1(preferenceDto.getImportanceCategory1());
-            preferenceEntity.setImportanceCategory2(preferenceDto.getImportanceCategory2());
-            preferenceEntity.setImportanceCategory3(preferenceDto.getImportanceCategory3());
-            preferenceEntity.setImportanceCategory4(preferenceDto.getImportanceCategory4());
-            preferenceEntity.setImportanceCategory5(preferenceDto.getImportanceCategory5());
-
-            preferenceRepository.save(preferenceEntity);
-        } else {
-            throw new IllegalArgumentException("해당하는 사용자를 찾을 수 없습니다.");
-        }
-    }*/
 }

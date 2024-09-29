@@ -2,8 +2,6 @@ package capstone.courseweb.random.service;
 
 import capstone.courseweb.random.dto.PlaceDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.lang.Assert;
 import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
@@ -18,8 +16,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 
@@ -30,7 +26,6 @@ public class SearchByKeywordService {
     @Value("${kakao.api-key}")
     private String CLIENT_ID;
     private final String KAKAO_API_URL = "https://dapi.kakao.com/v2/local/search/keyword";
-    //private static final String RADIUS = "15000";
     private HttpEntity<String> httpEntity;
 
     @PostConstruct
@@ -59,7 +54,6 @@ public class SearchByKeywordService {
                             .queryParam("x", x)
                             .queryParam("y", y)
                             .queryParam("3000")
-                            //.queryParam("radius","3000")
                             .encode(StandardCharsets.UTF_8)
                             .build().toUri();
         }
@@ -68,7 +62,6 @@ public class SearchByKeywordService {
         ResponseEntity<String> response = new RestTemplate().exchange(tmp, HttpMethod.GET, httpEntity, String.class);
 
         JSONObject jsonObject = new JSONObject(response.getBody().toString());
-        System.out.println("카카오맵 api documents" + response);
         JSONArray jsonArray = jsonObject.getJSONArray("documents");
 
 
@@ -98,11 +91,6 @@ public class SearchByKeywordService {
                 .build();
 
         return Optional.of(placeDto);
-    }
-
-    public PlaceDto getRandomPlace(List<PlaceDto> places) throws JsonProcessingException {
-        Random random = new Random();
-        return places.get(random.nextInt(places.size()));
     }
 
 }

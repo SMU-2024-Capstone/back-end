@@ -8,11 +8,9 @@ import org.springframework.context.annotation.Configuration;
 public class JwtFilterConfig {
 
     private final JwtAuthProvider jwtAuthProvider;
-
     public JwtFilterConfig(JwtAuthProvider jwtAuthProvider) {
         this.jwtAuthProvider = jwtAuthProvider;
     }
-
     @Bean
     public JwtFilter jwtFilter() {
         return new JwtFilter(jwtAuthProvider);
